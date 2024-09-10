@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import useSpeechToText from '../../hooks/useSpeechToText';
+import { useNavigate } from 'react-router-dom';
 
 const AccessibilityTaskbar = () => {
+    // Voice to Text
+    const { isListning, transcript, startListning, stopListning } = useSpeechToText({ continuous: true });
+    const navigate = useNavigate();
+
+    //accessibility settings
     const [seizureSafe, setSeizureSafe] = useState(false);
     const [visionImpaired, setVisionImpaired] = useState(false);
     const [fontSize, setFontSize] = useState(16);
@@ -11,6 +18,48 @@ const AccessibilityTaskbar = () => {
     const [saturation, setSaturation] = useState(100);
     const [isTaskbarVisible, setIsTaskbarVisible] = useState(true);
     const [showSettings, setShowSettings] = useState(null); // Track which popup is open
+
+// Start or stop listening based on the current state
+const startStopListening = () => {
+    isListning ? stopVoiceInput() : startListning();
+};
+
+// Check for voice commands and navigate based on the command
+useEffect(() => {
+    const command = transcript.trim().toLowerCase();
+    console.log(command);
+
+    // Call the appropriate navigation function based on the command
+    if (command === "go to login") {
+        navigateTo('/login');
+    } else if (command === "go to cart") {
+        navigateTo('/cart');
+    } else if (command === "go to profile") {
+        navigateTo('/profile');
+    } else if (command === "go to collection") {
+        navigateTo('/collection');
+    } else if (command === "go to home") {
+        navigateTo('/');
+    }else if (command === "go to about") {
+        navigateTo('/orders');
+    }
+    stopVoiceInput();
+}, [transcript]);
+
+// A general navigation function that takes the target route
+const navigateTo = (path) => {
+    navigate(path);
+
+    // Automatically stop listening after 5 seconds
+    setTimeout(() => {
+        stopVoiceInput();
+    }, 5000);
+};
+
+// Stop listening
+const stopVoiceInput = () => {
+    stopListning();
+};
 
     // Apply Seizure Safe Profile
     useEffect(() => {
@@ -162,7 +211,7 @@ const AccessibilityTaskbar = () => {
                         {/* Voice to Text Icon */}
                         <button
                             style={iconButtonStyle}
-                            onClick={() => alert('Voice to Text feature coming soon!')}
+                            onClick={startStopListening}
                             aria-label="Voice to Text Feature"
                         >
                             🎤

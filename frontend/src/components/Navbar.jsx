@@ -1,9 +1,23 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import {assets} from '../assets/assets'
 import { Link, NavLink } from 'react-router-dom'
 import { ShopContext } from '../context/ShopContext';
+import useSpeechToText from '../hooks/useSpeechToText';
 
 const Navbar = () => {
+    //voice recognition
+    const {isListning, transcript, startListning, stopListning} = useSpeechToText({continuous: true});
+    useEffect(() => {
+        const command = transcript.trim().toLowerCase();
+        console.log(command);
+
+        if (command === 'logout') {
+            navigate('/login')
+            localStorage.removeItem('token')
+            setToken('')
+            setCartItems({})
+        }
+    })
 
     const [visible,setVisible] = useState(false);
 
