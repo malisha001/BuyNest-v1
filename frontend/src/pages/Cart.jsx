@@ -5,7 +5,7 @@ import { assets } from '../assets/assets';
 import CartTotal from '../components/CartTotal';
 
 const Cart = () => {
-  const { products, currency, cartItems, updateQuantity, navigate } = useContext(ShopContext);
+  const { products, currency, cartItems, updateQuantity, navigate,getCartAmount ,delivery_fee} = useContext(ShopContext);
   const [cartData, setCartData] = useState([]);
   const [isHighContrast, setIsHighContrast] = useState(false); // For visually impaired users
 
@@ -68,7 +68,7 @@ const Cart = () => {
                       {/* Price and Size */}
                       <div className='flex items-center gap-3 mt-1'>
                         <p className={`text-xl font-bold ${isHighContrast ? 'text-white' : 'text-gray-800'}`} aria-label={`Price: ${currency}${productData.price}`}>
-                          {currency}{productData.price}
+                          {currency} {productData.price}.00
                         </p>
                         <p className={`px-3 py-1 border border-gray-300 text-sm ${isHighContrast ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-600'} rounded-md`} aria-label={`Size: ${item.size}`}>
                           {item.size}
@@ -124,34 +124,15 @@ const Cart = () => {
         </div>
 
         {/* Cart Total Section */}
-        <div className='lg:w-1/3 lg:flex lg:items-center'>
-          <div className='sticky top-20 self-start w-full'>
-            <div className={`bg-gray-100 rounded-xl shadow-md p-6 ${isHighContrast ? 'bg-black text-black' : ''}`}>
-              <h2 className={`text-lg font-bold mb-4 ${isHighContrast ? 'text-black' : 'text-gray-800'}`}>CART TOTALS</h2>
-              <div className='space-y-2'>
-                <div className='flex justify-between'>
-                  <p className={`${isHighContrast ? 'text-black' : 'text-gray-600'}`}>Subtotal</p>
-                  <p className={`${isHighContrast ? 'text-black' : 'text-gray-800'}`}>$870.00</p>
-                </div>
-                <div className='flex justify-between'>
-                  <p className={`${isHighContrast ? 'text-black' : 'text-gray-600'}`}>Shipping Fee</p>
-                  <p className={`${isHighContrast ? 'text-black' : 'text-gray-800'}`}>$10.00</p>
-                </div>
-                <div className='flex justify-between font-bold'>
-                  <p className={`${isHighContrast ? 'text-black' : 'text-gray-800'}`}>Total</p>
-                  <p className={`${isHighContrast ? 'text-black' : 'text-gray-800'}`}>$880.00</p>
-                </div>
-              </div>
-              <button 
-                onClick={() => navigate('/place-order')} 
-                className='w-full bg-black text-white text-sm font-semibold py-3 px-8 rounded-lg mt-6 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all'
-                aria-label="Proceed to checkout"
-              >
-                PROCEED TO CHECKOUT
-              </button>
-            </div>
+        <div className='flex justify-end my-20'>
+        <div className='w-full sm:w-[450px]'>
+          <CartTotal />
+          <div className=' w-full text-end'>
+            <button onClick={() => navigate('/place-order')} className='bg-black text-white text-sm my-8 px-8 py-3'>PROCEED TO CHECKOUT</button>
           </div>
         </div>
+      </div>
+        
       </div>
     </div>
   );
