@@ -19,6 +19,7 @@ import TestOne from './pages/Test/test1';
 import Test3 from './pages/Test/test3';
 import BarOnboard from './pages/Test/BarOnboard';
 import SearchBar from './components/SearchBar';
+import TrackOrder from './pages/TrackOrder';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Navbar from './components/Navbar';
@@ -77,6 +78,7 @@ const App = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/place-order" element={<PlaceOrder />} />
             <Route path="/orders" element={<Orders />} />
+            <Route path='/track-order/:orderId' element={<TrackOrder />} />
             <Route path="/live-start" element={<LiveAssistanceStart />} />
             <Route path="/live-wait" element={<WaitingForConnection />} />
             <Route path="/assis-dash" element={<AssistantDashboard />} />

@@ -1,99 +1,267 @@
-import React, { useContext, useEffect, useState } from 'react'
-import {assets} from '../assets/assets'
-import { Link, NavLink } from 'react-router-dom'
+import React, { useContext, useEffect, useState, useRef } from 'react';
+import { assets } from '../assets/assets';
+import { Link, NavLink } from 'react-router-dom';
 import { ShopContext } from '../context/ShopContext';
 import useSpeechToText from '../hooks/useSpeechToText';
 
 const Navbar = () => {
-    //voice recognition
-    const {isListning, transcript, startListning, stopListning} = useSpeechToText({continuous: true});
-    useEffect(() => {
-        const command = transcript.trim().toLowerCase();
-        console.log(command);
+  // States for visibility, contrast mode, and voice recognition
+  const [visible, setVisible] = useState(false);
+  const [isHighContrast, setIsHighContrast] = useState(false);
+  const { setShowSearch, getCartCount, navigate, token, setToken, setCartItems } = useContext(ShopContext);
 
-        if (command === 'logout') {
-            navigate('/login')
-            localStorage.removeItem('token')
-            setToken('')
-            setCartItems({})
-        }
-    })
+  // Voice recognition
+  const { isListening, transcript, startListening, stopListening } = useSpeechToText({ continuous: true });
 
-    const [visible,setVisible] = useState(false);
+  useEffect(() => {
+    const command = transcript.trim().toLowerCase();
+    console.log(command);
 
-    const {setShowSearch , getCartCount , navigate, token, setToken, setCartItems} = useContext(ShopContext);
-
-    const logout = () => {
-        navigate('/login')
-        localStorage.removeItem('token')
-        setToken('')
-        setCartItems({})
+    if (command === 'logout') {
+      navigate('/login');
+      localStorage.removeItem('token');
+      setToken('');
+      setCartItems({});
     }
+  }, [transcript, navigate, setToken, setCartItems]);
+
+  const toggleContrast = () => setIsHighContrast(!isHighContrast);
+
+  // Ref for the navbar to get its height dynamically
+  const navbarRef = useRef(null);
+
+  useEffect(() => {
+    const navbarHeight = navbarRef.current.getBoundingClientRect().height;
+    document.body.style.paddingTop = `${navbarHeight}px`;
+
+    return () => {
+      document.body.style.paddingTop = '0px';
+    };
+  }, []);
+
+  const logout = () => {
+    navigate('/login');
+    localStorage.removeItem('token');
+    setToken('');
+    setCartItems({});
+  };
 
   return (
-    <div className='flex items-center justify-between py-5 font-medium'>
-      
-      <Link to='/'><img src={assets.logo} className='w-36' alt="" /></Link>
+    <div
+      ref={navbarRef}
+      className={`fixed top-0 left-0 right-0 z-50 border border-transparent rounded-md backdrop-blur-lg shadow-lg ${
+        isHighContrast ? 'bg-black text-white text-xl' : 'bg-lightblue-100 text-base text-gray-700'
+      }`}
+      style={{
+        backdropFilter: 'blur(10px)',
+        backgroundColor: isHighContrast ? 'rgba(0, 0, 0, 0.85)' : 'rgba(224, 247, 250, 0.3)',
+      }}
+    >
+      <div className="container mx-auto flex items-center justify-between py-5 px-4 font-medium">
+        {/* Logo */}
+        <Link to="/" aria-label="Homepage">
+          <img src={assets.logo} className="w-36" alt="Logo" />
+        </Link>
 
-      <ul className='hidden sm:flex gap-5 text-sm text-gray-700'>
-        
-        <NavLink to='/' className='flex flex-col items-center gap-1'>
+        {/* Navigation Links */}
+        <ul className={`hidden sm:flex gap-8 tracking-wider ${isHighContrast ? 'text-white font-bold' : 'text-gray-700'}`}>
+          <NavLink
+            to="/"
+            className="relative flex flex-col items-center gap-1 group"
+            activeClassName="active-link"
+            aria-label="Home"
+            style={({ isActive }) => ({
+              borderBottom: isActive ? '3px solid #333' : 'none',
+              paddingBottom: isActive ? '5px' : 'none',
+            })}
+          >
             <p>HOME</p>
-            <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden' />
-        </NavLink>
-        <NavLink to='/collection' className='flex flex-col items-center gap-1'>
+          </NavLink>
+          <NavLink
+            to="/collection"
+            className="relative flex flex-col items-center gap-1 group"
+            activeClassName="active-link"
+            aria-label="Collection"
+            style={({ isActive }) => ({
+              borderBottom: isActive ? '3px solid #333' : 'none',
+              paddingBottom: isActive ? '5px' : 'none',
+            })}
+          >
             <p>COLLECTION</p>
-            <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden' />
-        </NavLink>
-        <NavLink to='/about' className='flex flex-col items-center gap-1'>
+          </NavLink>
+          <NavLink
+            to="/about"
+            className="relative flex flex-col items-center gap-1 group"
+            activeClassName="active-link"
+            aria-label="About Us"
+            style={({ isActive }) => ({
+              borderBottom: isActive ? '3px solid #333' : 'none',
+              paddingBottom: isActive ? '5px' : 'none',
+            })}
+          >
             <p>ABOUT</p>
-            <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden' />
-        </NavLink>
-        <NavLink to='/contact' className='flex flex-col items-center gap-1'>
+          </NavLink>
+          <NavLink
+            to="/contact"
+            className="relative flex flex-col items-center gap-1 group"
+            activeClassName="active-link"
+            aria-label="Contact"
+            style={({ isActive }) => ({
+              borderBottom: isActive ? '3px solid #333' : 'none',
+              paddingBottom: isActive ? '5px' : 'none',
+            })}
+          >
             <p>CONTACT</p>
-            <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden' />
-        </NavLink>
+          </NavLink>
+        </ul>
 
-      </ul>
+        {/* Right-side icons */}
+        <div className="flex items-center gap-6">
+          {/* Search Icon */}
+          <img
+            onClick={() => setShowSearch(true)}
+            src={assets.search_icon}
+            className={`w-6 cursor-pointer hover:opacity-70 transition-opacity duration-300 ${
+              isHighContrast ? 'filter invert' : ''
+            }`}
+            alt="Search"
+            aria-label="Search"
+          />
 
-      <div className='flex items-center gap-6'>
-            <img onClick={()=> { setShowSearch(true); navigate('/collection') }} src={assets.search_icon} className='w-5 cursor-pointer' alt="" />
-            
-            <div className='group relative'>
-                <img onClick={()=> token ? null : navigate('/login') } className='w-5 cursor-pointer' src={assets.profile_icon} alt="" />
-                {/* Dropdown Menu */}
-                {token && 
-                <div className='group-hover:block hidden absolute dropdown-menu right-0 pt-4'>
-                    <div className='flex flex-col gap-2 w-36 py-3 px-5  bg-slate-100 text-gray-500 rounded'>
-                        <p className='cursor-pointer hover:text-black'>My Profile</p>
-                        <p onClick={()=>navigate('/orders')} className='cursor-pointer hover:text-black'>Orders</p>
-                        <p onClick={logout} className='cursor-pointer hover:text-black'>Logout</p>
-                    </div>
-                </div>}
-            </div> 
-            <Link to='/cart' className='relative'>
-                <img src={assets.cart_icon} className='w-5 min-w-5' alt="" />
-                <p className='absolute right-[-5px] bottom-[-5px] w-4 text-center leading-4 bg-black text-white aspect-square rounded-full text-[8px]'>{getCartCount()}</p>
-            </Link> 
-            <img onClick={()=>setVisible(true)} src={assets.menu_icon} className='w-5 cursor-pointer sm:hidden' alt="" /> 
+          {/* Profile with Dropdown */}
+          <div className="group relative">
+            <img
+              onClick={() => {
+                token ? null : navigate('/login');
+              }}
+              className={`w-6 cursor-pointer ${isHighContrast ? 'filter invert' : ''}`}
+              src={assets.profile_icon}
+              alt="Profile"
+              aria-label="Profile"
+            />
+            {token && (
+              <div className="group-hover:block hidden absolute dropdown-menu right-0 mt-2 py-2 w-48 bg-white border border-gray-200 shadow-lg rounded-lg text-gray-600 transition-all duration-300">
+                <p className="cursor-pointer px-4 py-2 hover:bg-gray-100 hover:text-black transition-colors duration-200">My Profile</p>
+                <p
+                  onClick={() => navigate('/orders')}
+                  className="cursor-pointer px-4 py-2 hover:bg-gray-100 hover:text-black transition-colors duration-200"
+                >
+                  Orders
+                </p>
+                <p onClick={logout} className="cursor-pointer px-4 py-2 hover:bg-gray-100 hover:text-black transition-colors duration-200">
+                  Logout
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Cart Icon with Item Count */}
+          <Link to="/cart" className="relative" aria-label="Cart">
+            <img
+              src={assets.cart_icon}
+              className={`w-6 cursor-pointer hover:opacity-70 transition-opacity duration-300 ${
+                isHighContrast ? 'filter invert' : ''
+              }`}
+              alt="Cart"
+            />
+            <p className="absolute right-[-10px] bottom-[-10px] w-5 h-5 text-center leading-5 bg-black text-white text-xs rounded-full">
+              {getCartCount()}
+            </p>
+          </Link>
+
+          {/* High Contrast Mode Toggle */}
+          <button
+            onClick={toggleContrast}
+            className={`p-2 bg-gray-200 rounded-full text-sm ${
+              isHighContrast ? 'text-white bg-black' : 'text-gray-800'
+            } hover:bg-gray-300`}
+            aria-label="Toggle High Contrast Mode"
+          >
+            {isHighContrast ? 'Normal Mode' : 'High Contrast'}
+          </button>
+
+          {/* Voice Recognition Button */}
+          <button
+            onClick={() => navigate('/live-assistance')}
+            className="px-4 py-2 bg-darkblue-500 text-white rounded-full text-sm font-bold transition-all transform hover:scale-105 hover:shadow-lg focus:outline-none animate-pulse glow-border"
+            style={{ backgroundColor: '#003366' }} // Dark Blue
+            aria-label="Live Assistance"
+          >
+            Live Assistance
+          </button>
+
+          {/* Mobile Menu Icon */}
+          <img
+            onClick={() => setVisible(true)}
+            src={assets.menu_icon}
+            className={`w-6 cursor-pointer sm:hidden ${isHighContrast ? 'filter invert' : ''}`}
+            alt="Menu"
+            aria-label="Menu"
+          />
+        </div>
       </div>
 
-        {/* Sidebar menu for small screens */}
-        <div className={`absolute top-0 right-0 bottom-0 overflow-hidden bg-white transition-all ${visible ? 'w-full' : 'w-0'}`}>
-                <div className='flex flex-col text-gray-600'>
-                    <div onClick={()=>setVisible(false)} className='flex items-center gap-4 p-3 cursor-pointer'>
-                        <img className='h-4 rotate-180' src={assets.dropdown_icon} alt="" />
-                        <p>Back</p>
-                    </div>
-                    <NavLink onClick={()=>setVisible(false)} className='py-2 pl-6 border' to='/'>HOME</NavLink>
-                    <NavLink onClick={()=>setVisible(false)} className='py-2 pl-6 border' to='/collection'>COLLECTION</NavLink>
-                    <NavLink onClick={()=>setVisible(false)} className='py-2 pl-6 border' to='/about'>ABOUT</NavLink>
-                    <NavLink onClick={()=>setVisible(false)} className='py-2 pl-6 border' to='/contact'>CONTACT</NavLink>
-                </div>
+      {/* Mobile Menu */}
+      <div
+        className={`absolute top-0 right-0 bottom-0 bg-white transition-all ${
+          visible ? 'w-full sm:w-1/2' : 'w-0'
+        } overflow-hidden`}
+      >
+        <div className="flex flex-col p-6 text-gray-600">
+          <div onClick={() => setVisible(false)} className="flex items-center gap-4 mb-6 cursor-pointer">
+            <img
+              className={`h-4 rotate-180 ${isHighContrast ? 'filter invert' : ''}`}
+              src={assets.dropdown_icon}
+              alt="Back"
+              aria-label="Back"
+            />
+            <p className="text-gray-700">Back</p>
+          </div>
+
+          <NavLink
+            onClick={() => setVisible(false)}
+            className={`py-2 border-b border-gray-200 text-lg ${
+              isHighContrast ? 'text-white font-bold text-xl' : 'text-gray-600 text-base'
+            }`}
+            to="/"
+            aria-label="Home"
+          >
+            HOME
+          </NavLink>
+          <NavLink
+            onClick={() => setVisible(false)}
+            className={`py-2 border-b border-gray-200 text-lg ${
+              isHighContrast ? 'text-white font-bold text-xl' : 'text-gray-600 text-base'
+            }`}
+            to="/collection"
+            aria-label="Collection"
+          >
+            COLLECTION
+          </NavLink>
+          <NavLink
+            onClick={() => setVisible(false)}
+            className={`py-2 border-b border-gray-200 text-lg ${
+              isHighContrast ? 'text-white font-bold text-xl' : 'text-gray-600 text-base'
+            }`}
+            to="/about"
+            aria-label="About Us"
+          >
+            ABOUT
+          </NavLink>
+          <NavLink
+            onClick={() => setVisible(false)}
+            className={`py-2 border-b border-gray-200 text-lg ${
+              isHighContrast ? 'text-white font-bold text-xl' : 'text-gray-600 text-base'
+            }`}
+            to="/contact"
+            aria-label="Contact"
+          >
+            CONTACT
+          </NavLink>
         </div>
-
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;
