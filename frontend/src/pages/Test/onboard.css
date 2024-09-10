@@ -1,0 +1,181 @@
+
+.welcome-main {
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Full height of the viewport */
+  }
+  
+  /* Container that holds all content */
+  .welcome-container {
+    display: flex;
+    flex: 1; /* Make the container take up the remaining space */
+    justify-content: space-between;
+    align-items: center; /* Vertically centers content */
+    padding: 99px 80px 28px 0;
+  }
+  
+  /* Content area with info and image */
+  .welcome-content {
+    gap: 20px;
+    display: flex;
+    flex: 1; /* Make sure it stretches to fill the available height */
+  }
+  
+  /* Info section (text part) */
+  .welcome-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center content vertically */
+    line-height: normal;
+    width: 39%;
+    margin-left: 0px;
+  }
+  
+  @media (max-width: 991px) {
+    .welcome-info {
+      width: 100%;
+    }
+  }
+  
+  /* Grouping the text and buttons together */
+  .welcome-group {
+    background-color: transparent;
+    display: flex;
+    margin-top: 4px;
+    flex-grow: 1;
+    flex-direction: column;
+    align-items: flex-start;
+    font-family: Inter, sans-serif;
+    font-weight: 500;
+    width: 100%;
+    padding: 25px 80px 54px 33px;
+  }
+  
+  @media (max-width: 991px) {
+    .welcome-group {
+      max-width: 100%;
+      margin-top: 40px;
+      padding: 0 20px;
+    }
+  }
+  
+  /* Header text */
+  .welcome-prices-text {
+    color: #4362b9;
+    font-size: 50px; /* Increased font size */
+  }
+  
+  .and-save-text {
+    color: #353535;
+    font-size: 45px; /* Increased font size */
+    margin-top: 7px;
+  }
+  
+  /* Description text */
+  .shop-smart-description {
+    color: #787878;
+    font-size: 18px; /* Increased font size */
+    font-weight: 400;
+    margin-top: 39px;
+  }
+  
+  /* Start shopping button */
+  .start-shopping-button {
+    background-color: transparent;
+    display: flex;
+    margin-top: 29px;
+    width: 180px; /* Increased button width */
+    max-width: 100%;
+    flex-direction: column;
+    font-size: 14px; /* Increased font size */
+    color: #6d8fc9;
+    font-weight: 600;
+    justify-content: center;
+    padding: 5px; /* Increased padding */
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .start-shopping-button:hover .start-shopping-background {
+    background-color: #c4d9f7;
+  }
+  
+  .start-shopping-background {
+    border-radius: 6px 2px 2px 4px;
+    background-color: #dfedfd;
+    padding: 15px 25px; /* Increased padding */
+    border: 1px solid #ecf2fb;
+  }
+  
+  @media (max-width: 991px) {
+    .start-shopping-background {
+      padding-right: 20px;
+    }
+  }
+  
+  /* Next button */
+  .next-button {
+    background-color: transparent;
+    display: flex;
+    margin-top: 40px;
+    width: 200px; /* Increased button width */
+    max-width: 100%;
+    flex-direction: column;
+    font-size: 18px; /* Increased font size */
+    color: #bfdff6;
+    font-weight: 600;
+    white-space: nowrap;
+    justify-content: center;
+    padding: 5px; /* Increased padding */
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .next-button:hover .next-button-background {
+    background-color: #1e5bbf;
+  }
+  
+  .next-button-background {
+    border-radius: 3px;
+    background-color: #2870d7;
+    padding: 20px 70px; /* Increased padding */
+    border: 1px solid #5b8dcf;
+  }
+  
+  @media (max-width: 991px) {
+    .next-button-background {
+      white-space: initial;
+      padding: 0 20px;
+    }
+  }
+  
+  /* Image section */
+  .welcome-image {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Vertically centers image */
+    line-height: normal;
+    width: 61%;
+    margin-left: 20px;
+  }
+  
+  @media (max-width: 991px) {
+    .welcome-image {
+      width: 100%;
+    }
+  }
+  
+  /* Image styling */
+  .welcome-img {
+    aspect-ratio: 2.32;
+    object-fit: contain;
+    object-position: center;
+    width: 100%;
+  }
+  
+  @media (max-width: 991px) {
+    .welcome-img {
+      max-width: 100%;
+      margin-top: 40px;
+    }
+  }
+  

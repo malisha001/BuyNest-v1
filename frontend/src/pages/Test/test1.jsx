@@ -1,6 +1,6 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import './test1.css'; 
-import './welcome.css';
 import ProductCard from "./ProductCard";
 
 const products = [
@@ -36,41 +36,38 @@ const products = [
   },
 ];
 
-function TestOne() {
+const TestOne = () => {
+  const navigate = useNavigate();
+
+  const goToNextStep = () => {
+    navigate('/test3');
+  };
+
   return (
     <main className="welcome-main">
-<div className="welcome-container">
-  <div className="welcome-content">
-    <section className="welcome-info">
-      <div className="welcome-group">
-        <h1 className="welcome-prices-text">Discover Your Optimal</h1>
-        <h2 className="and-save-text">Viewing Experience</h2>
-        {/* <p className="shop-smart-description"></p> */}
-        <button className="start-shopping-button">
-          <span className="start-shopping-background">
-            Start shopping
-          </span>
-        </button>
-        <button className="next-button">
-          <span className="next-button-background">Next</span>
-        </button>
+      <div className="welcome-container">
+        <section className="welcome-info">
+          <div className="welcome-group">
+            <h1 className="welcome-prices-text">Discover Your Optimal</h1>
+            <h2 className="and-save-text">Viewing Experience</h2>
+            <button className="onboarding-button" onClick={goToNextStep}>
+              <span className="next-button-background">Next</span>
+            </button>
+          </div>
+        </section>
+        <div className="right-column">
+          <div className="product-grid">
+            {products.map((product) => (
+              <ProductCard
+                key={product.id}
+                imageSrc={product.imageSrc}
+              />
+            ))}
+          </div>
+        </div>
       </div>
-    </section>
-    <div className="right-column">
-              <div className="product-grid">
-                {products.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    imageSrc={product.imageSrc}
-                  />
-                ))}
-              </div>
-            </div>
-  </div>
-</div>
-</main>
+    </main>
   );
-}
+};
 
 export default TestOne;
-

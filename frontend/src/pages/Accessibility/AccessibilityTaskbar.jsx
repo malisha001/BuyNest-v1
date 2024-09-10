@@ -67,7 +67,7 @@ const AccessibilityTaskbar = () => {
 
     // Apply Saturation Adjustment
     useEffect(() => {
-        document.body.style.filter = `saturate(${saturation}%)`;
+        document.body.style.filter = saturation !== 100 ? `saturate(${saturation}%)` : 'none';
     }, [saturation]);
 
     // Function to Reset All Accessibility Settings to Default
@@ -92,20 +92,22 @@ const AccessibilityTaskbar = () => {
             {isTaskbarVisible && (
                 <div style={{
                     position: 'fixed',
-                    bottom: '20px', // Floats 20px above the bottom
+                    bottom: '20px',
                     left: '50%',
                     transform: 'translateX(-50%)',
-                    backgroundColor: 'rgba(0, 0, 0, 0.9)',  // Black glossy look
+                    backgroundColor: 'rgba(0, 0, 0, 0.85)',  // Darker glassy look
+                    backdropFilter: 'blur(10px)', // Blur for glass effect
                     color: 'white',
-                    padding: '10px',
-                    borderRadius: '50px',  // Rounded edges
+                    padding: '10px 20px',
+                    borderRadius: '30px',  // Softer, more rounded edges
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     zIndex: 1000,
                     fontFamily: 'Arial, sans-serif',
-                    width: 'auto', // Reduce width to fit icons
-                    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.5)',  // Floating effect
+                    width: 'auto',
+                    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.5)',  // Shadow for floating effect
+                    border: '1px solid rgba(255, 255, 255, 0.2)',  // Soft border for definition
                 }}>
                     <div style={{
                         display: 'flex',
@@ -114,19 +116,8 @@ const AccessibilityTaskbar = () => {
                     }}>
                         {/* Font Size Icon */}
                         <button
-                            style={{
-                                fontSize: '20px',
-                                color: 'white',
-                                cursor: 'pointer',
-                                border: 'none',
-                                background: 'transparent',
-                                padding: '10px',
-                                borderRadius: '50%',
-                                transition: 'background 0.3s ease',
-                            }}
+                            style={iconButtonStyle}
                             onClick={() => handleIconClick('fontSize')}
-                            onMouseEnter={(e) => e.target.style.backgroundColor = '#333'}
-                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
                             aria-label="Adjust Font Size"
                         >
                             🔤
@@ -134,39 +125,17 @@ const AccessibilityTaskbar = () => {
 
                         {/* Line Height Icon */}
                         <button
-                            style={{
-                                fontSize: '20px',
-                                color: 'white',
-                                cursor: 'pointer',
-                                border: 'none',
-                                background: 'transparent',
-                                padding: '10px',
-                                borderRadius: '50%',
-                                transition: 'background 0.3s ease',
-                            }}
+                            style={iconButtonStyle}
                             onClick={() => handleIconClick('lineHeight')}
-                            onMouseEnter={(e) => e.target.style.backgroundColor = '#333'}
-                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
                             aria-label="Adjust Line Height"
                         >
                             📏
                         </button>
 
-                        {/* Letter Spacing (Line Spacing) Icon */}
+                        {/* Letter Spacing Icon */}
                         <button
-                            style={{
-                                fontSize: '20px',
-                                color: 'white',
-                                cursor: 'pointer',
-                                border: 'none',
-                                background: 'transparent',
-                                padding: '10px',
-                                borderRadius: '50%',
-                                transition: 'background 0.3s ease',
-                            }}
+                            style={iconButtonStyle}
                             onClick={() => handleIconClick('letterSpacing')}
-                            onMouseEnter={(e) => e.target.style.backgroundColor = '#333'}
-                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
                             aria-label="Adjust Letter Spacing"
                         >
                             ↔️
@@ -174,19 +143,8 @@ const AccessibilityTaskbar = () => {
 
                         {/* Monochrome Icon */}
                         <button
-                            style={{
-                                fontSize: '20px',
-                                color: 'white',
-                                cursor: 'pointer',
-                                border: 'none',
-                                background: 'transparent',
-                                padding: '10px',
-                                borderRadius: '50%',
-                                transition: 'background 0.3s ease',
-                            }}
+                            style={iconButtonStyle}
                             onClick={() => handleIconClick('monochrome')}
-                            onMouseEnter={(e) => e.target.style.backgroundColor = '#333'}
-                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
                             aria-label="Toggle Monochrome"
                         >
                             🖤
@@ -194,62 +152,29 @@ const AccessibilityTaskbar = () => {
 
                         {/* Vision Impaired Icon */}
                         <button
-                            style={{
-                                fontSize: '20px',
-                                color: 'white',
-                                cursor: 'pointer',
-                                border: 'none',
-                                background: 'transparent',
-                                padding: '10px',
-                                borderRadius: '50%',
-                                transition: 'background 0.3s ease',
-                            }}
+                            style={iconButtonStyle}
                             onClick={() => handleIconClick('visionImpaired')}
-                            onMouseEnter={(e) => e.target.style.backgroundColor = '#333'}
-                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
                             aria-label="Toggle Vision Impaired Profile"
                         >
                             👓
                         </button>
 
-                        {/* Seizure Safe Profile */}
+                        {/* Voice to Text Icon */}
                         <button
-                            style={{
-                                fontSize: '20px',
-                                color: 'white',
-                                cursor: 'pointer',
-                                border: 'none',
-                                background: 'transparent',
-                                padding: '10px',
-                                borderRadius: '50%',
-                                transition: 'background 0.3s ease',
-                            }}
-                            onClick={() => handleIconClick('seizureSafe')}
-                            onMouseEnter={(e) => e.target.style.backgroundColor = '#333'}
-                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-                            aria-label="Toggle Seizure Safe Profile"
+                            style={iconButtonStyle}
+                            onClick={() => alert('Voice to Text feature coming soon!')}
+                            aria-label="Voice to Text Feature"
                         >
-                            🧠
+                            🎤
                         </button>
 
-                        {/* Saturation Icon */}
+                        {/* Screen Reader Icon */}
                         <button
-                            style={{
-                                fontSize: '20px',
-                                color: 'white',
-                                cursor: 'pointer',
-                                border: 'none',
-                                background: 'transparent',
-                                padding: '10px',
-                                borderRadius: '50%',
-                                transition: 'background 0.3s ease',
-                            }}
-                            onClick={() => handleIconClick('saturation')}
-                            onMouseEnter={(e) => e.target.style.backgroundColor = '#333'}
-                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-                            aria-label="Adjust Saturation"
+                            style={iconButtonStyle}
+                            onClick={() => alert('Screen Reader feature coming soon!')}
+                            aria-label="Screen Reader Feature"
                         >
-                            🎨
+                            🗣️
                         </button>
 
                         {/* Reset Button */}
@@ -273,152 +198,27 @@ const AccessibilityTaskbar = () => {
 
                     {/* Settings Popup */}
                     {showSettings === 'fontSize' && (
-                        <div style={{
-                            position: 'absolute',
-                            bottom: '60px',
-                            backgroundColor: 'white',
-                            color: 'black',
-                            padding: '10px',
-                            borderRadius: '8px',
-                            boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)',
-                        }}>
-                            <label>Font Size: {fontSize}px</label>
-                            <input
-                                type="range"
-                                min="12"
-                                max="40"
-                                value={fontSize}
-                                onChange={(e) => setFontSize(e.target.value)}
-                                style={{ marginLeft: '10px', cursor: 'pointer', width: '100px' }}
-                            />
-                        </div>
+                        <SettingsPopup label={`Font Size: ${fontSize}px`} min="12" max="40" value={fontSize} onChange={(e) => setFontSize(e.target.value)} />
                     )}
 
                     {showSettings === 'lineHeight' && (
-                        <div style={{
-                            position: 'absolute',
-                            bottom: '60px',
-                            backgroundColor: 'white',
-                            color: 'black',
-                            padding: '10px',
-                            borderRadius: '8px',
-                            boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)',
-                        }}>
-                            <label>Line Height: {lineHeight}</label>
-                            <input
-                                type="range"
-                                min="1"
-                                max="3"
-                                step="0.1"
-                                value={lineHeight}
-                                onChange={(e) => setLineHeight(e.target.value)}
-                                style={{ marginLeft: '10px', cursor: 'pointer', width: '100px' }}
-                            />
-                        </div>
+                        <SettingsPopup label={`Line Height: ${lineHeight}`} min="1" max="3" step="0.1" value={lineHeight} onChange={(e) => setLineHeight(e.target.value)} />
                     )}
 
                     {showSettings === 'letterSpacing' && (
-                        <div style={{
-                            position: 'absolute',
-                            bottom: '60px',
-                            backgroundColor: 'white',
-                            color: 'black',
-                            padding: '10px',
-                            borderRadius: '8px',
-                            boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)',
-                        }}>
-                            <label>Letter Spacing: {letterSpacing}px</label>
-                            <input
-                                type="range"
-                                min="0"
-                                max="5"
-                                value={letterSpacing}
-                                onChange={(e) => setLetterSpacing(e.target.value)}
-                                style={{ marginLeft: '10px', cursor: 'pointer', width: '100px' }}
-                            />
-                        </div>
+                        <SettingsPopup label={`Letter Spacing: ${letterSpacing}px`} min="0" max="5" value={letterSpacing} onChange={(e) => setLetterSpacing(e.target.value)} />
                     )}
 
                     {showSettings === 'monochrome' && (
-                        <div style={{
-                            position: 'absolute',
-                            bottom: '60px',
-                            backgroundColor: 'white',
-                            color: 'black',
-                            padding: '10px',
-                            borderRadius: '8px',
-                            boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)',
-                        }}>
-                            <label>Monochrome: {monochrome ? "On" : "Off"}</label>
-                            <input
-                                type="checkbox"
-                                checked={monochrome}
-                                onChange={() => setMonochrome(!monochrome)}
-                                style={{ marginLeft: '10px', cursor: 'pointer' }}
-                            />
-                        </div>
-                    )}
-
-                    {showSettings === 'saturation' && (
-                        <div style={{
-                            position: 'absolute',
-                            bottom: '60px',
-                            backgroundColor: 'white',
-                            color: 'black',
-                            padding: '10px',
-                            borderRadius: '8px',
-                            boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)',
-                        }}>
-                            <label>Saturation: {saturation}%</label>
-                            <input
-                                type="range"
-                                min="0"
-                                max="200"
-                                value={saturation}
-                                onChange={(e) => setSaturation(e.target.value)}
-                                style={{ marginLeft: '10px', cursor: 'pointer', width: '100px' }}
-                            />
-                        </div>
+                        <SettingsPopup label={`Monochrome: ${monochrome ? "On" : "Off"}`} isCheckbox={true} checked={monochrome} onChange={() => setMonochrome(!monochrome)} />
                     )}
 
                     {showSettings === 'visionImpaired' && (
-                        <div style={{
-                            position: 'absolute',
-                            bottom: '60px',
-                            backgroundColor: 'white',
-                            color: 'black',
-                            padding: '10px',
-                            borderRadius: '8px',
-                            boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)',
-                        }}>
-                            <label>Vision Impaired Profile: {visionImpaired ? "On" : "Off"}</label>
-                            <input
-                                type="checkbox"
-                                checked={visionImpaired}
-                                onChange={() => setVisionImpaired(!visionImpaired)}
-                                style={{ marginLeft: '10px', cursor: 'pointer' }}
-                            />
-                        </div>
+                        <SettingsPopup label={`Vision Impaired Profile: ${visionImpaired ? "On" : "Off"}`} isCheckbox={true} checked={visionImpaired} onChange={() => setVisionImpaired(!visionImpaired)} />
                     )}
 
                     {showSettings === 'seizureSafe' && (
-                        <div style={{
-                            position: 'absolute',
-                            bottom: '60px',
-                            backgroundColor: 'white',
-                            color: 'black',
-                            padding: '10px',
-                            borderRadius: '8px',
-                            boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)',
-                        }}>
-                            <label>Seizure Safe Profile: {seizureSafe ? "On" : "Off"}</label>
-                            <input
-                                type="checkbox"
-                                checked={seizureSafe}
-                                onChange={() => setSeizureSafe(!seizureSafe)}
-                                style={{ marginLeft: '10px', cursor: 'pointer' }}
-                            />
-                        </div>
+                        <SettingsPopup label={`Seizure Safe Profile: ${seizureSafe ? "On" : "Off"}`} isCheckbox={true} checked={seizureSafe} onChange={() => setSeizureSafe(!seizureSafe)} />
                     )}
                 </div>
             )}
@@ -447,5 +247,52 @@ const AccessibilityTaskbar = () => {
         </>
     );
 };
+
+// Icon Button Styles
+const iconButtonStyle = {
+    fontSize: '20px',
+    color: 'white',
+    cursor: 'pointer',
+    border: 'none',
+    background: 'transparent',
+    padding: '10px',
+    borderRadius: '50%',
+    transition: 'background 0.3s ease',
+    onMouseEnter: (e) => e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)',
+    onMouseLeave: (e) => e.target.style.backgroundColor = 'transparent',
+};
+
+// Settings Popup Component
+const SettingsPopup = ({ label, min, max, step = 1, value, onChange, isCheckbox, checked }) => (
+    <div style={{
+        position: 'absolute',
+        bottom: '60px',
+        backgroundColor: 'white',
+        color: 'black',
+        padding: '10px',
+        borderRadius: '8px',
+        boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)',
+    }}>
+        <label>{label}</label>
+        {isCheckbox ? (
+            <input
+                type="checkbox"
+                checked={checked}
+                onChange={onChange}
+                style={{ marginLeft: '10px', cursor: 'pointer' }}
+            />
+        ) : (
+            <input
+                type="range"
+                min={min}
+                max={max}
+                step={step}
+                value={value}
+                onChange={onChange}
+                style={{ marginLeft: '10px', cursor: 'pointer', width: '100px' }}
+            />
+        )}
+    </div>
+);
 
 export default AccessibilityTaskbar;

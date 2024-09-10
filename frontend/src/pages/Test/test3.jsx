@@ -1,8 +1,15 @@
 import React from "react";
+import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
 import './welcome.css'; 
 import TextSizeTest from './TextSizeTest'; // Import the TextSizeTest component
 
 const Test3 = () => {
+  const navigate = useNavigate(); // Initialize navigate function
+
+  const goToOnboardingPage = () => {
+    navigate('/taskbar'); // Navigate to OnboardingPage component
+  };
+
   return (
     <main className="welcome-main">
       <div className="welcome-container">
@@ -12,14 +19,14 @@ const Test3 = () => {
               <h1 className="welcome-prices-text">Customize Your</h1>
               <h2 className="and-save-text">Viewing Experience</h2>
               <p className="shop-smart-description">
-              Ensure easy reading for all by adjusting text size with the slider below. Your preferences are saved for a consistent browsing experience on your next visit.
+                Ensure easy reading for all by adjusting text size with the slider below. Your preferences are saved for a consistent browsing experience on your next visit.
               </p>
               <button className="start-shopping-button">
                 <span className="start-shopping-background">
                   Start shopping
                 </span>
               </button>
-              <button className="next-button">
+              <button className="next-button" onClick={goToOnboardingPage}>
                 <span className="next-button-background">Next</span>
               </button>
             </div>
