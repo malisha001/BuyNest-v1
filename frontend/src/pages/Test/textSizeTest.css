@@ -1,0 +1,104 @@
+/* Reduced height for the container, increased width */
+.full-screen-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60vh; /* Reduced height */
+    width: 50vw;  /* Increased width */
+    margin: 0 auto; /* Center the container */
+    background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+    animation: subtle-background 10s ease-in-out infinite alternate;
+}
+
+@keyframes subtle-background {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+}
+
+/* Text-size box styling */
+.text-size-box {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 80%; /* Increased width of the box */
+    max-width: 1000px;
+    transition: all 0.3s ease;
+}
+
+/* Heading style with smooth transition */
+.text-size-box h1 {
+    margin-bottom: 20px;
+    transition: font-size 0.3s ease;
+}
+
+/* Description text */
+.description-text {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+/* Slider and font size display */
+.slider-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.text-size-slider {
+    width: 60%;
+    appearance: none;
+    height: 8px;
+    background: #ddd;
+    border-radius: 5px;
+    outline: none;
+}
+
+.text-size-slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    background: #1a73e8;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.text-size-slider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    background: #1a73e8;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.font-size-display {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Button hover effect */
+.apply-button {
+    padding: 12px 24px;
+    background-color: #1a73e8;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.apply-button:hover {
+    background-color: #1664c1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .text-size-box {
+        width: 95%;
+    }
+}
+
