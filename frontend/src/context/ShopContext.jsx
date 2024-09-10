@@ -1,5 +1,6 @@
 import { createContext, useState } from "react";
 import { products } from "../assets/assets";
+import {getProducts} from '../service/productAndHome';
 import { toast } from 'react-toastify'; // Import toast for error handling
 import { useNavigate } from "react-router-dom";
 
@@ -66,6 +67,7 @@ const ShopContextProvider = (props) => {
 
 
     const getCartAmount = () => {
+
         let totalAmount = 0;
         for (const items in cartItems) {
             let itemInfo = products.find((product) => product._id === items);
