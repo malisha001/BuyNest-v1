@@ -8,7 +8,7 @@ import NewsletterBox from '../components/NewsletterBox'
 const Home = () => {
   return (
     <div>
-      <Hero />
+      {/* <Hero /> */}
       <LatestCollection />
       <BestSeller />
       <OurPolicy />

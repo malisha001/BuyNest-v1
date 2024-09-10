@@ -43,7 +43,7 @@ const ProductItem = ({ id, image, name, price, isHighContrast }) => {
             isHighContrast ? 'text-gray-300' : 'text-gray-800'
           }`}
         >
-          {currency}{price}
+          {currency}  {price}.00
         </p>
       </div>
 
