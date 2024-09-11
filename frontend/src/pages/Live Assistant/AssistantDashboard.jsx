@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FaUser, FaClock, FaSearch, FaPowerOff } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const sampleRequests = [
   { id: 1, name: 'John Doe', time: '2 min ago', type: 'Checkout Assistance' },
@@ -14,6 +15,8 @@ const AssistantDashboard = () => {
   const [availability, setAvailability] = useState(false); // Track availability status
   const [sessionRequests, setSessionRequests] = useState([]);
   const [activeSessions, setActiveSessions] = useState([]);
+  
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
     // Simulate fetching session requests and active sessions
@@ -23,6 +26,10 @@ const AssistantDashboard = () => {
 
   const toggleAvailability = () => {
     setAvailability(!availability);
+  };
+
+  const handleAccept = () => {
+    navigate('/assis-live'); // Navigate to /assis-live
   };
 
   return (
@@ -71,7 +78,10 @@ const AssistantDashboard = () => {
                       <FaClock className={`mr-2 ${availability ? 'text-gray-400' : 'text-gray-600'}`} />
                       <span className={`${availability ? 'text-gray-400' : 'text-gray-600'}`}>{request.time}</span>
                     </div>
-                    <button className={`ml-4 px-5 py-2 rounded-full ${availability ? 'bg-blue-500 hover:bg-blue-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'} font-semibold shadow-lg transition-transform transform hover:scale-105`}>
+                    <button 
+                      onClick={handleAccept} // Attach the onClick handler to navigate
+                      className={`ml-4 px-5 py-2 rounded-full ${availability ? 'bg-blue-500 hover:bg-blue-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'} font-semibold shadow-lg transition-transform transform hover:scale-105`}
+                    >
                       Accept
                     </button>
                   </li>

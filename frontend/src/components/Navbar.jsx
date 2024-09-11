@@ -189,7 +189,7 @@ const Navbar = () => {
 
           {/* Voice Recognition Button */}
           <button
-            onClick={() => navigate('/live-assistance')}
+            onClick={() => navigate('/live-start')}
             className="px-4 py-2 bg-darkblue-500 text-white rounded-full text-sm font-bold transition-all transform hover:scale-105 hover:shadow-lg focus:outline-none animate-pulse glow-border"
             style={{ backgroundColor: '#003366' }} // Dark Blue
             aria-label="Live Assistance"
