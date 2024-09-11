@@ -86,4 +86,33 @@ const singleProduct = async (req, res) => {
     }
 }
 
-export { listProducts, addProduct, removeProduct, singleProduct }
+// Update Product function without image uploads
+const updateProduct = async (req, res) => {
+    try {
+        const { id, name, price, category, sizes } = req.body;
+
+        // Find product by ID
+        const product = await productModel.findById(id);
+        if (!product) {
+            return res.json({ success: false, message: "Product not found" });
+        }
+
+        // Update product fields (without images)
+        product.name = name || product.name;
+        product.price = price || product.price;
+        product.category = category || product.category;
+        product.sizes = sizes || product.sizes;
+
+        // Save updated product
+        await product.save();
+        res.json({ success: true, message: "Product updated successfully" });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+}
+
+
+
+
+export { listProducts, addProduct, removeProduct, singleProduct , updateProduct}

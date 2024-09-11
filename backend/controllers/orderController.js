@@ -216,6 +216,33 @@ const userOrders = async (req,res) => {
     }
 }
 
+export const getOrderDetails = async (req, res) => {
+    try {
+      const { orderId } = req.body;
+      console.log(orderId)
+  
+      
+      if (!orderId) {
+        return res.status(400).json({ success: false, message: 'Order ID is required' });
+      }
+  
+     
+      const order = await orderModel.findOne({ _id: orderId});
+  
+      if (!order) {
+        return res.status(404).json({ success: false, message: 'Order not found' });
+      }
+  
+      
+      res.json({ success: true, order });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, message: 'Server error' });
+    }
+  };
+  
+  
+
 // update order status from Admin Panel
 const updateStatus = async (req,res) => {
     try {
@@ -232,3 +259,4 @@ const updateStatus = async (req,res) => {
 }
 
 export {verifyRazorpay, verifyStripe ,placeOrder, placeOrderStripe, placeOrderRazorpay, allOrders, userOrders, updateStatus}
+

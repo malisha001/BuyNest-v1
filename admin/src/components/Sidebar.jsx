@@ -1,31 +1,44 @@
-import React from 'react'
-import { NavLink } from 'react-router-dom'
-import { assets } from '../assets/assets'
+import React from 'react';
+import { FaPlus, FaList, FaBox, FaUserFriends, FaUsers, FaTags, FaStore } from 'react-icons/fa'; // Icons for sidebar items
 
 const Sidebar = () => {
-  return (
-    <div className='w-[18%] min-h-screen border-r-2'>
-        <div className='flex flex-col gap-4 pt-6 pl-[20%] text-[15px]'>
+    return (
+        <aside className="w-64 bg-white shadow-lg rounded-lg p-6 bg-opacity-60 backdrop-blur-lg border border-gray-200">
+            {/* Sidebar Items */}
+            <ul className="space-y-6">
+                <li className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition transform hover:scale-105">
+                    <FaPlus className="text-gray-700" />
+                    <a href="/add" className="text-gray-800 font-semibold text-base">Add Items</a>
+                </li>
+                <li className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition transform hover:scale-105">
+                    <FaList className="text-gray-700" />
+                    <a href="/list" className="text-gray-800 font-semibold text-base">List Items</a>
+                </li>
+                <li className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition transform hover:scale-105">
+                    <FaBox className="text-gray-700" />
+                    <a href="/orders" className="text-gray-800 font-semibold text-base">Orders</a>
+                </li>
 
-            <NavLink className='flex items-center gap-3 border border-gray-300 border-r-0 px-3 py-2 rounded-l' to="/add">
-                <img className='w-5 h-5' src={assets.add_icon} alt="" />
-                <p className='hidden md:block'>Add Items</p>
-            </NavLink>
+                {/* New Sections */}
+                <li className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition transform hover:scale-105">
+                    <FaUserFriends className="text-gray-700" />
+                    <a href="/" className="text-gray-800 font-semibold text-base">Helper Management</a>
+                </li>
+                <li className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition transform hover:scale-105">
+                    <FaUsers className="text-gray-700" />
+                    <a href="/" className="text-gray-800 font-semibold text-base">Live Human Management</a>
+                </li>
+                <li className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition transform hover:scale-105">
+                    <FaTags className="text-gray-700" />
+                    <a href="/" className="text-gray-800 font-semibold text-base">Category Management</a>
+                </li>
+                <li className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition transform hover:scale-105">
+                    <FaStore className="text-gray-700" />
+                    <a href="/" className="text-gray-800 font-semibold text-base">Department Store Management</a>
+                </li>
+            </ul>
+        </aside>
+    );
+};
 
-            <NavLink className='flex items-center gap-3 border border-gray-300 border-r-0 px-3 py-2 rounded-l' to="/list">
-                <img className='w-5 h-5' src={assets.order_icon} alt="" />
-                <p className='hidden md:block'>List Items</p>
-            </NavLink>
-
-            <NavLink className='flex items-center gap-3 border border-gray-300 border-r-0 px-3 py-2 rounded-l' to="/orders">
-                <img className='w-5 h-5' src={assets.order_icon} alt="" />
-                <p className='hidden md:block'>Orders</p>
-            </NavLink>
-
-        </div>
-
-    </div>
-  )
-}
-
-export default Sidebar
+export default Sidebar;

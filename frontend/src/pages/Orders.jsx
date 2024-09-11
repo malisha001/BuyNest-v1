@@ -2,12 +2,12 @@ import React, { useContext, useEffect, useState } from 'react';
 import { ShopContext } from '../context/ShopContext';
 import Title from '../components/Title';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 
 const Orders = () => {
   const { backendUrl, token, currency } = useContext(ShopContext);
   const [orderData, setOrderData] = useState([]);
-  const navigate = useNavigate(); // To navigate to track order page
+  const navigate = useNavigate(); // Initialize navigate
 
   const loadOrderData = async () => {
     try {
@@ -41,7 +41,7 @@ const Orders = () => {
 
   // Navigate to the track order page
   const handleTrackOrder = (orderId) => {
-    navigate(`/track-order/${orderId}`);
+    navigate(`/track-order/${orderId}`); // Use navigate to go to the TrackOrder page
   };
 
   return (
@@ -71,6 +71,7 @@ const Orders = () => {
                 <p className={`min-w-2 h-2 rounded-full ${item.status === 'Delivered' ? 'bg-green-500' : 'bg-yellow-500'}`}></p>
                 <p className='text-sm md:text-base'>{item.status}</p>
               </div>
+              {/* Track Order Button */}
               <button 
                 onClick={() => handleTrackOrder(item.orderId)} 
                 className='border px-4 py-2 text-sm font-medium rounded-sm'>

@@ -9,9 +9,12 @@ const Navbar = () => {
   const [visible, setVisible] = useState(false);
   const [isHighContrast, setIsHighContrast] = useState(false);
   const { setShowSearch, getCartCount, navigate, token, setToken, setCartItems } = useContext(ShopContext);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); 
 
   // Voice recognition
   const { isListening, transcript, startListening, stopListening } = useSpeechToText({ continuous: true });
+
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     const command = transcript.trim().toLowerCase();
@@ -45,6 +48,19 @@ const Navbar = () => {
     setToken('');
     setCartItems({});
   };
+
+  // Close dropdown if clicked outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [dropdownRef]);
 
   return (
     <div
@@ -128,29 +144,20 @@ const Navbar = () => {
             aria-label="Search"
           />
 
-          {/* Profile with Dropdown */}
-          <div className="group relative">
+        {/* Profile with Dropdown */}
+        <div className="relative">
             <img
-              onClick={() => {
-                token ? null : navigate('/login');
-              }}
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)} // Toggle dropdown visibility
               className={`w-6 cursor-pointer ${isHighContrast ? 'filter invert' : ''}`}
               src={assets.profile_icon}
               alt="Profile"
               aria-label="Profile"
             />
-            {token && (
-              <div className="group-hover:block hidden absolute dropdown-menu right-0 mt-2 py-2 w-48 bg-white border border-gray-200 shadow-lg rounded-lg text-gray-600 transition-all duration-300">
-                <p className="cursor-pointer px-4 py-2 hover:bg-gray-100 hover:text-black transition-colors duration-200">My Profile</p>
-                <p
-                  onClick={() => navigate('/orders')}
-                  className="cursor-pointer px-4 py-2 hover:bg-gray-100 hover:text-black transition-colors duration-200"
-                >
-                  Orders
-                </p>
-                <p onClick={logout} className="cursor-pointer px-4 py-2 hover:bg-gray-100 hover:text-black transition-colors duration-200">
-                  Logout
-                </p>
+            {isDropdownOpen && token && (
+              <div ref={dropdownRef} className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 shadow-lg rounded-lg text-gray-600">
+                <p className="cursor-pointer px-4 py-2 hover:bg-gray-100" onClick={() => navigate('/profile')}>My Profile</p>
+                <p className="cursor-pointer px-4 py-2 hover:bg-gray-100" onClick={() => navigate('/orders')}>Orders</p>
+                <p className="cursor-pointer px-4 py-2 hover:bg-gray-100" onClick={logout}>Logout</p>
               </div>
             )}
           </div>
