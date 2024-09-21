@@ -3,12 +3,12 @@ import useSpeechToText from '../../hooks/useSpeechToText';
 import { useNavigate } from 'react-router-dom';
 
 const AccessibilityTaskbar = () => {
-    // Voice to Text
+   
     const { isListning, transcript, startListning, stopListning } = useSpeechToText({ continuous: true });
-    const [isVoiceActive, setIsVoiceActive] = useState(false); // To control animation
+    const [isVoiceActive, setIsVoiceActive] = useState(false); 
     const navigate = useNavigate();
 
-    // Accessibility settings
+    
     const [seizureSafe, setSeizureSafe] = useState(false);
     const [visionImpaired, setVisionImpaired] = useState(false);
     const [fontSize, setFontSize] = useState(16);
@@ -18,15 +18,15 @@ const AccessibilityTaskbar = () => {
     const [monochrome, setMonochrome] = useState(false);
     const [saturation, setSaturation] = useState(100);
     const [isTaskbarVisible, setIsTaskbarVisible] = useState(true);
-    const [showSettings, setShowSettings] = useState(null); // Track which popup is open
+    const [showSettings, setShowSettings] = useState(null); 
 
-    // Start or stop listening based on the current state and show animation
+   
     const startStopListening = () => {
         if (isListning) {
             stopVoiceInput();
         } else {
             startListning();
-            setIsVoiceActive(true);  // Activate visual animation
+            setIsVoiceActive(true); 
         }
     };
 
@@ -52,7 +52,7 @@ const AccessibilityTaskbar = () => {
 
         // Stop the animation and display the spoken transcript
         if (transcript) {
-            setIsVoiceActive(false); // Stop animation after command is spoken
+            setIsVoiceActive(false); 
         }
     }, [transcript]);
 
@@ -72,33 +72,33 @@ const AccessibilityTaskbar = () => {
         setIsVoiceActive(false); // Deactivate the visual animation
     };
 
-    // Apply Seizure Safe Profile
+    
     useEffect(() => {
         document.body.style.filter = seizureSafe ? 'grayscale(100%)' : 'none';
     }, [seizureSafe]);
 
-    // Apply Vision Impaired Profile
+    
     useEffect(() => {
         document.body.style.fontSize = visionImpaired ? '20px' : '16px';
         document.body.style.filter = visionImpaired ? 'contrast(150%)' : 'contrast(100%)';
     }, [visionImpaired]);
 
-    // Apply Font Size
+   
     useEffect(() => {
         document.body.style.fontSize = `${fontSize}px`;
     }, [fontSize]);
 
-    // Apply Line Height
+   
     useEffect(() => {
         document.body.style.lineHeight = `${lineHeight}`;
     }, [lineHeight]);
 
-    // Apply Letter Spacing (Line Spacing)
+    
     useEffect(() => {
         document.body.style.letterSpacing = `${letterSpacing}px`;
     }, [letterSpacing]);
 
-    // Apply Contrast
+   
     useEffect(() => {
         switch (contrast) {
             case 'dark':
@@ -120,12 +120,12 @@ const AccessibilityTaskbar = () => {
         }
     }, [contrast]);
 
-    // Apply Monochrome Filter
+   
     useEffect(() => {
         document.body.style.filter = monochrome ? 'grayscale(100%)' : '';
     }, [monochrome]);
 
-    // Apply Saturation Adjustment
+  
     useEffect(() => {
         document.body.style.filter = saturation !== 100 ? `saturate(${saturation}%)` : 'none';
     }, [saturation]);
@@ -142,12 +142,12 @@ const AccessibilityTaskbar = () => {
         setSaturation(100);
     };
 
-    // Handle which settings box to show
+    
     const handleIconClick = (settingsType) => {
         setShowSettings(showSettings === settingsType ? null : settingsType); // Toggle popup
     };
 
-    // Inline styles for the ChatGPT-like smooth orb animation
+    
     const orbContainerStyles = {
         position: 'fixed',
         bottom: '180px',
@@ -182,17 +182,17 @@ const AccessibilityTaskbar = () => {
         bottom: '150px',
         left: '50%',
         transform: 'translateX(-50%)',
-        backgroundColor: 'rgba(0, 0, 0, 0.85)', // Darker background for better contrast
+        backgroundColor: 'rgba(0, 0, 0, 0.85)', 
         color: '#FFFFFF',
         padding: '15px 30px',
         borderRadius: '25px',
         fontSize: '22px',
         fontWeight: 'bold',
         zIndex: 1002,
-        letterSpacing: '1px', // Clear spacing for readability
+        letterSpacing: '1px', 
     };
 
-    // Add keyframe animation as inline CSS
+    
     const keyframes = `
         @keyframes orbGlow {
             0%, 100% {
@@ -212,7 +212,7 @@ const AccessibilityTaskbar = () => {
                 {keyframes}
             </style>
 
-            {/* ChatGPT-like orb animation for voice commands */}
+            {/*  orb animation for voice commands */}
             {isVoiceActive && (
                 <div style={orbContainerStyles}>
                     <div style={orbStyles}></div>
@@ -220,7 +220,7 @@ const AccessibilityTaskbar = () => {
                 </div>
             )}
 
-            {/* Display spoken words as the user speaks */}
+            {/* Display spoken words */}
             {isListning && (
                 <div style={voiceTextStyles}>
                     <p>{transcript || 'Listening...'}</p>
@@ -233,19 +233,19 @@ const AccessibilityTaskbar = () => {
                     bottom: '20px',
                     left: '50%',
                     transform: 'translateX(-50%)',
-                    backgroundColor: 'rgba(34, 34, 34, 0.95)',  // Dark theme
-                    backdropFilter: 'blur(10px)', // Blur for glass effect
+                    backgroundColor: 'rgba(34, 34, 34, 0.95)', 
+                    backdropFilter: 'blur(10px)', 
                     color: 'white',
                     padding: '10px 20px',
-                    borderRadius: '30px',  // Softer, more rounded edges
+                    borderRadius: '30px',  
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     zIndex: 1000,
                     fontFamily: 'Arial, sans-serif',
                     width: 'auto',
-                    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.5)',  // Shadow for floating effect
-                    border: '1px solid rgba(255, 255, 255, 0.2)',  // Soft border for definition
+                    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.5)',  
+                    border: '1px solid rgba(255, 255, 255, 0.2)',  
                 }}>
                     <div style={{
                         display: 'flex',
@@ -405,15 +405,15 @@ const SettingsPopup = ({ label, min, max, step = 1, value, onChange, isCheckbox,
         bottom: '80px', // Spacing between taskbar and popup
         left: '50%',
         transform: 'translateX(-50%)', 
-        backgroundColor: 'rgba(50, 50, 50, 0.95)', // Dark theme with glassy effect
-        backdropFilter: 'blur(10px)', // Blur for modern look
+        backgroundColor: 'rgba(50, 50, 50, 0.95)', 
+        backdropFilter: 'blur(10px)',
         color: 'white',
         padding: '20px',
-        borderRadius: '12px', // Softer rounded corners
-        boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.25)', // Floating shadow effect
-        minWidth: '350px', // Wider for a more modern look
+        borderRadius: '12px',
+        boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.25)', 
+        minWidth: '350px', 
         textAlign: 'center',
-        zIndex: 1001, // Above taskbar
+        zIndex: 1001, 
     }} className="popup-content">
         <label>{label}</label>
         {isCheckbox ? (
@@ -435,8 +435,8 @@ const SettingsPopup = ({ label, min, max, step = 1, value, onChange, isCheckbox,
                     marginLeft: '10px', 
                     cursor: 'pointer', 
                     width: '100px',
-                    accentColor: '#1a73e8', // Blue slider handle color
-                    backgroundColor: '#1a73e8', // Blue track color
+                    accentColor: '#1a73e8', 
+                    backgroundColor: '#1a73e8', 
                 }}
             />
         )}
