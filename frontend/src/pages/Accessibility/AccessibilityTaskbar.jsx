@@ -5,9 +5,10 @@ import { useNavigate } from 'react-router-dom';
 const AccessibilityTaskbar = () => {
     // Voice to Text
     const { isListning, transcript, startListning, stopListning } = useSpeechToText({ continuous: true });
+    const [isVoiceActive, setIsVoiceActive] = useState(false); // To control animation
     const navigate = useNavigate();
 
-    //accessibility settings
+    // Accessibility settings
     const [seizureSafe, setSeizureSafe] = useState(false);
     const [visionImpaired, setVisionImpaired] = useState(false);
     const [fontSize, setFontSize] = useState(16);
@@ -19,47 +20,57 @@ const AccessibilityTaskbar = () => {
     const [isTaskbarVisible, setIsTaskbarVisible] = useState(true);
     const [showSettings, setShowSettings] = useState(null); // Track which popup is open
 
-// Start or stop listening based on the current state
-const startStopListening = () => {
-    isListning ? stopVoiceInput() : startListning();
-};
+    // Start or stop listening based on the current state and show animation
+    const startStopListening = () => {
+        if (isListning) {
+            stopVoiceInput();
+        } else {
+            startListning();
+            setIsVoiceActive(true);  // Activate visual animation
+        }
+    };
 
-// Check for voice commands and navigate based on the command
-useEffect(() => {
-    const command = transcript.trim().toLowerCase();
-    console.log(command);
+    // Check for voice commands and navigate based on the command
+    useEffect(() => {
+        const command = transcript.trim().toLowerCase();
+        console.log(command);
 
-    // Call the appropriate navigation function based on the command
-    if (command === "go to login") {
-        navigateTo('/login');
-    } else if (command === "go to cart") {
-        navigateTo('/cart');
-    } else if (command === "go to profile") {
-        navigateTo('/profile');
-    } else if (command === "go to collection") {
-        navigateTo('/collection');
-    } else if (command === "go to home") {
-        navigateTo('/');
-    }else if (command === "go to about") {
-        navigateTo('/orders');
-    }
-    stopVoiceInput();
-}, [transcript]);
+        // Call the appropriate navigation function based on the command
+        if (command === "go to login") {
+            navigateTo('/login');
+        } else if (command === "go to cart") {
+            navigateTo('/cart');
+        } else if (command === "go to profile") {
+            navigateTo('/profile');
+        } else if (command === "go to collection") {
+            navigateTo('/collection');
+        } else if (command === "go to home") {
+            navigateTo('/');
+        } else if (command === "go to about") {
+            navigateTo('/orders');
+        }
 
-// A general navigation function that takes the target route
-const navigateTo = (path) => {
-    navigate(path);
+        // Stop the animation and display the spoken transcript
+        if (transcript) {
+            setIsVoiceActive(false); // Stop animation after command is spoken
+        }
+    }, [transcript]);
 
-    // Automatically stop listening after 5 seconds
-    setTimeout(() => {
-        stopVoiceInput();
-    }, 5000);
-};
+    // A general navigation function that takes the target route
+    const navigateTo = (path) => {
+        navigate(path);
 
-// Stop listening
-const stopVoiceInput = () => {
-    stopListning();
-};
+        // Automatically stop listening after 5 seconds
+        setTimeout(() => {
+            stopVoiceInput();
+        }, 5000);
+    };
+
+    // Stop listening and deactivate animation
+    const stopVoiceInput = () => {
+        stopListning();
+        setIsVoiceActive(false); // Deactivate the visual animation
+    };
 
     // Apply Seizure Safe Profile
     useEffect(() => {
@@ -136,15 +147,93 @@ const stopVoiceInput = () => {
         setShowSettings(showSettings === settingsType ? null : settingsType); // Toggle popup
     };
 
+    // Inline styles for the ChatGPT-like smooth orb animation
+    const orbContainerStyles = {
+        position: 'fixed',
+        bottom: '180px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'column',
+        zIndex: 1001,
+        textAlign: 'center',
+    };
+
+    const orbStyles = {
+        width: '80px',
+        height: '80px',
+        borderRadius: '50%',
+        background: 'linear-gradient(135deg, #66e2ff, #8e9bff, #d066ff, #ff66b3)',
+        animation: 'orbGlow 2s ease-in-out infinite',
+        boxShadow: '0 0 30px rgba(0, 255, 255, 0.5)',
+    };
+
+    const listeningTextStyles = {
+        color: 'white',
+        marginTop: '15px',
+        fontSize: '20px',
+        fontWeight: 'bold',
+    };
+
+    const voiceTextStyles = {
+        position: 'fixed',
+        bottom: '150px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        backgroundColor: 'rgba(0, 0, 0, 0.85)', // Darker background for better contrast
+        color: '#FFFFFF',
+        padding: '15px 30px',
+        borderRadius: '25px',
+        fontSize: '22px',
+        fontWeight: 'bold',
+        zIndex: 1002,
+        letterSpacing: '1px', // Clear spacing for readability
+    };
+
+    // Add keyframe animation as inline CSS
+    const keyframes = `
+        @keyframes orbGlow {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+            }
+            50% {
+                transform: scale(1.1);
+                box-shadow: 0 0 35px rgba(0, 255, 255, 0.8);
+            }
+        }
+    `;
+
     return (
         <>
+            <style>
+                {keyframes}
+            </style>
+
+            {/* ChatGPT-like orb animation for voice commands */}
+            {isVoiceActive && (
+                <div style={orbContainerStyles}>
+                    <div style={orbStyles}></div>
+                    <div style={listeningTextStyles}>Go ahead, I'm listening...</div>
+                </div>
+            )}
+
+            {/* Display spoken words as the user speaks */}
+            {isListning && (
+                <div style={voiceTextStyles}>
+                    <p>{transcript || 'Listening...'}</p>
+                </div>
+            )}
+
             {isTaskbarVisible && (
                 <div style={{
                     position: 'fixed',
                     bottom: '20px',
                     left: '50%',
                     transform: 'translateX(-50%)',
-                    backgroundColor: 'rgba(0, 0, 0, 0.85)',  // Darker glassy look
+                    backgroundColor: 'rgba(34, 34, 34, 0.95)',  // Dark theme
                     backdropFilter: 'blur(10px)', // Blur for glass effect
                     color: 'white',
                     padding: '10px 20px',
@@ -307,21 +396,25 @@ const iconButtonStyle = {
     padding: '10px',
     borderRadius: '50%',
     transition: 'background 0.3s ease',
-    onMouseEnter: (e) => e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)',
-    onMouseLeave: (e) => e.target.style.backgroundColor = 'transparent',
 };
 
 // Settings Popup Component
 const SettingsPopup = ({ label, min, max, step = 1, value, onChange, isCheckbox, checked }) => (
     <div style={{
-        position: 'absolute',
-        bottom: '60px',
-        backgroundColor: 'white',
-        color: 'black',
-        padding: '10px',
-        borderRadius: '8px',
-        boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)',
-    }}>
+        position: 'fixed',
+        bottom: '80px', // Spacing between taskbar and popup
+        left: '50%',
+        transform: 'translateX(-50%)', 
+        backgroundColor: 'rgba(50, 50, 50, 0.95)', // Dark theme with glassy effect
+        backdropFilter: 'blur(10px)', // Blur for modern look
+        color: 'white',
+        padding: '20px',
+        borderRadius: '12px', // Softer rounded corners
+        boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.25)', // Floating shadow effect
+        minWidth: '350px', // Wider for a more modern look
+        textAlign: 'center',
+        zIndex: 1001, // Above taskbar
+    }} className="popup-content">
         <label>{label}</label>
         {isCheckbox ? (
             <input
@@ -338,7 +431,13 @@ const SettingsPopup = ({ label, min, max, step = 1, value, onChange, isCheckbox,
                 step={step}
                 value={value}
                 onChange={onChange}
-                style={{ marginLeft: '10px', cursor: 'pointer', width: '100px' }}
+                style={{ 
+                    marginLeft: '10px', 
+                    cursor: 'pointer', 
+                    width: '100px',
+                    accentColor: '#1a73e8', // Blue slider handle color
+                    backgroundColor: '#1a73e8', // Blue track color
+                }}
             />
         )}
     </div>
