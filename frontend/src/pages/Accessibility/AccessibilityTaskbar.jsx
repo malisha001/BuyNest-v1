@@ -356,16 +356,7 @@ const AccessibilityTaskbar = () => {
                             🎤
                         </button>
 
-                        {/* Screen Reader Icon */}
-                        <button
-                            style={iconButtonStyle}
-                            onClick={() => alert('Screen Reader feature coming soon!')}
-                            aria-label="Screen Reader Feature"
-                            onMouseEnter={() => setTooltip("Screen Reader (Say 'Activate Screen Reader')")}
-                            onMouseLeave={() => setTooltip('')}
-                        >
-                            🗣️
-                        </button>
+                       
 
                         {/* Reset Button */}
                         <button
