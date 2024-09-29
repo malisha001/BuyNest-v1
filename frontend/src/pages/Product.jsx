@@ -51,6 +51,14 @@ const Product = () => {
     setNotification({ type: 'success', message: 'Item added to cart successfully!' });
   };
 
+  // Function to read the notification aloud
+  const readNotification = (message) => {
+    if (window.speechSynthesis) {
+      const speech = new SpeechSynthesisUtterance(message);
+      window.speechSynthesis.speak(speech);
+    }
+  };
+
   useEffect(() => {
     return () => {
       if (isSpeaking) window.speechSynthesis.cancel();
@@ -61,6 +69,7 @@ const Product = () => {
   useEffect(() => {
     if (notification) {
       const timer = setTimeout(() => setNotification(null), 3000); // Auto dismiss notification after 3 seconds
+      readNotification(notification.message); // Trigger reading the notification when it appears
       return () => clearTimeout(timer); // Cleanup the timer on unmount
     }
   }, [notification]);
@@ -71,8 +80,8 @@ const Product = () => {
     const { type, message } = notification;
 
     const icon =
-      type === 'success' ? <FaCheckCircle className="text-green-500" size={24} /> :
-      type === 'warning' ? <FaExclamationCircle className="text-yellow-500" size={24} /> : null;
+      type === 'success' ? <FaCheckCircle className="text-green-500" size={32} /> :
+      type === 'warning' ? <FaExclamationCircle className="text-yellow-500" size={32} /> : null;
 
     return (
       <div
