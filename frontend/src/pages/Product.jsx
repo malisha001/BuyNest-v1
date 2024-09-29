@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { ShopContext } from '../context/ShopContext';
 import { assets } from '../assets/assets';
 import RelatedProducts from '../components/RelatedProducts';
-import { FaVolumeUp, FaVolumeMute } from 'react-icons/fa';
+import { FaVolumeUp, FaVolumeMute, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa'; // Importing icons for notifications
 
 const Product = () => {
   const { productId } = useParams();
@@ -12,6 +12,7 @@ const Product = () => {
   const [image, setImage] = useState('');
   const [size, setSize] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [notification, setNotification] = useState(null); // State for notifications
 
   useEffect(() => {
     const fetchProductData = async () => {
@@ -41,14 +42,58 @@ const Product = () => {
     }
   };
 
+  const handleAddToCart = () => {
+    if (!size) {
+      setNotification({ type: 'warning', message: 'Please select a size before adding to cart.' });
+      return;
+    }
+    addToCart(productData._id, size);
+    setNotification({ type: 'success', message: 'Item added to cart successfully!' });
+  };
+
   useEffect(() => {
     return () => {
       if (isSpeaking) window.speechSynthesis.cancel();
     };
   }, [isSpeaking]);
 
+  // Notification component with auto-dismiss after 3 seconds
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => setNotification(null), 3000); // Auto dismiss notification after 3 seconds
+      return () => clearTimeout(timer); // Cleanup the timer on unmount
+    }
+  }, [notification]);
+
+  // Notification rendering logic
+  const renderNotification = () => {
+    if (!notification) return null;
+    const { type, message } = notification;
+
+    const icon =
+      type === 'success' ? <FaCheckCircle className="text-green-500" size={24} /> :
+      type === 'warning' ? <FaExclamationCircle className="text-yellow-500" size={24} /> : null;
+
+    return (
+      <div
+        role="alert"
+        className={`fixed top-[120px] left-1/2 transform -translate-x-1/2 p-4 rounded-lg shadow-lg border ${
+          type === 'success' ? 'bg-green-50 border-green-500' : 'bg-yellow-50 border-yellow-500'
+        } flex items-center gap-3`}
+      >
+        {icon}
+        <p className="text-gray-700 text-lg" aria-live="polite">
+          {message}
+        </p>
+      </div>
+    );
+  };
+
   return productData ? (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 lg:px-20">
+    <div className="min-h-screen bg-gray-50 py-12 px-4 lg:px-20 relative">
+      {/* Notification */}
+      {renderNotification()}
+
       {/* Product Section */}
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
         {/* Product Images */}
@@ -122,7 +167,7 @@ const Product = () => {
 
             {/* Add to Cart Button */}
             <button
-              onClick={() => addToCart(productData._id, size)}
+              onClick={handleAddToCart}
               className="mt-6 w-full bg-[#124271] text-white py-3 rounded-lg shadow-md hover:bg-[#0d355c] transition-all"
             >
               Add to Cart
