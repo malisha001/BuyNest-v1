@@ -129,6 +129,18 @@ const Navbar = () => {
           >
             <p>CONTACT</p>
           </NavLink>
+          <NavLink
+            to="/accessibility"
+            className="relative flex flex-col items-center gap-1 group"
+            activeClassName="active-link"
+            aria-label="Contact"
+            style={({ isActive }) => ({
+              borderBottom: isActive ? '3px solid #333' : 'none',
+              paddingBottom: isActive ? '5px' : 'none',
+            })}
+          >
+            <p>ACCESSIBILITY</p>
+          </NavLink>
         </ul>
 
         {/* Right-side icons */}

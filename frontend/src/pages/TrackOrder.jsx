@@ -9,10 +9,10 @@ const TrackOrder = () => {
   const [orderDetails, setOrderDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [selectedSizes, setSelectedSizes] = useState({}); // To store selected sizes for each item
-  const [isPopupOpen, setIsPopupOpen] = useState(false); // Control popup visibility
-  const [currentItemId, setCurrentItemId] = useState(null); // Track the current item for size selection
-  const [selectedSize, setSelectedSize] = useState(''); // Track the selected size for current item
+  const [selectedSizes, setSelectedSizes] = useState({}); 
+  const [isPopupOpen, setIsPopupOpen] = useState(false); 
+  const [currentItemId, setCurrentItemId] = useState(null); 
+  const [selectedSize, setSelectedSize] = useState(''); 
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
@@ -24,7 +24,7 @@ const TrackOrder = () => {
 
       try {
         const response = await axios.post(
-          `${backendUrl}/api/order/track-order`, // Correct string interpolation
+          `${backendUrl}/api/order/track-order`, 
           { orderId },
           { headers: { token } }
         );
@@ -59,17 +59,14 @@ const TrackOrder = () => {
     alert("Cancel request sent!");
   };
 
-  // Handle size selection and adding to cart
   const handleReorder = () => {
     if (orderDetails && orderDetails.items) {
       let itemsNeedingSize = orderDetails.items.filter(item => item.sizes && !selectedSizes[item._id]);
       
       if (itemsNeedingSize.length > 0) {
-        // Open the popup for the first item that needs size selection
         setCurrentItemId(itemsNeedingSize[0]._id);
         setIsPopupOpen(true);
       } else {
-        // If all items have selected sizes or do not require sizes, proceed with adding to cart
         orderDetails.items.forEach((item) => {
           const selectedSize = selectedSizes[item._id] || (item.sizes && item.sizes.length > 0 ? "S" : null);
 
@@ -84,25 +81,21 @@ const TrackOrder = () => {
     }
   };
 
-  // Handle size selection via popup
   const handleSizeSelection = (size) => {
-    setSelectedSize(size); // Set the selected size for the current item
+    setSelectedSize(size); 
   };
 
-  // Handle applying the selected size and moving to the next item
   const handleApplySizeSelection = () => {
     setSelectedSizes((prev) => ({ ...prev, [currentItemId]: selectedSize }));
-    setIsPopupOpen(false); // Close the popup after selecting size
+    setIsPopupOpen(false); 
 
-    // After selecting the size for the current item, check if other items need size selection
     let remainingItems = orderDetails.items.filter(item => item.sizes && !selectedSizes[item._id] && item._id !== currentItemId);
 
     if (remainingItems.length > 0) {
-      setCurrentItemId(remainingItems[0]._id); // Open popup for the next item
-      setSelectedSize(''); // Reset selected size for the next item
+      setCurrentItemId(remainingItems[0]._id); 
+      setSelectedSize(''); 
       setIsPopupOpen(true);
     } else {
-      // If no more items need size selection, add all items to cart
       orderDetails.items.forEach((item) => {
         const selectedSize = selectedSizes[item._id] || (item.sizes && item.sizes.length > 0 ? "S" : null);
 
@@ -114,12 +107,10 @@ const TrackOrder = () => {
     }
   };
 
-  // Close popup
   const closePopup = () => {
     setIsPopupOpen(false);
   };
 
-  // Display loading, error, or order details
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen bg-[#E2E9EC]">
@@ -154,7 +145,7 @@ const TrackOrder = () => {
             )}
             <button
               onClick={handleReorder}
-              className="px-4 py-2 bg-blue-500 text-white rounded-full shadow-md hover:bg-blue-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="px-4 py-2 bg-[#124271] text-white rounded-full shadow-md hover:bg-[#0E365A] transition duration-300 focus:outline-none focus:ring-2 focus:ring-[#124271]"
             >
               Reorder
             </button>
@@ -218,7 +209,6 @@ const TrackOrder = () => {
               ))}
             </ul>
 
-            {/* Popup for Size Selection */}
             {isPopupOpen && (
               <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
                 <div className="bg-white p-6 rounded-lg shadow-lg w-96">
@@ -238,7 +228,7 @@ const TrackOrder = () => {
                         </button>
                       ))}
                   </div>
-                  {/* Apply Button */}
+
                   <div className="flex justify-end mt-4 space-x-4">
                     <button
                       onClick={closePopup}
