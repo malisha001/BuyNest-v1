@@ -3,11 +3,12 @@ import { ShopContext } from '../context/ShopContext';
 import Title from '../components/Title';
 import { assets } from '../assets/assets';
 import CartTotal from '../components/CartTotal';
+import { FaVolumeUp, FaVolumeMute } from 'react-icons/fa'; // Icons for voice-over
 
 const Cart = () => {
-  const { products, currency, cartItems, updateQuantity, navigate,getCartAmount ,delivery_fee} = useContext(ShopContext);
+  const { products, currency, cartItems, updateQuantity, navigate, getCartAmount, delivery_fee } = useContext(ShopContext);
   const [cartData, setCartData] = useState([]);
-  const [isHighContrast, setIsHighContrast] = useState(false); // For visually impaired users
+  const [isSpeaking, setIsSpeaking] = useState(false); // State for voice-over
 
   useEffect(() => {
     if (products.length > 0) {
@@ -27,25 +28,52 @@ const Cart = () => {
     }
   }, [cartItems, products]);
 
-  // Toggle high contrast mode
-  const toggleContrast = () => setIsHighContrast(!isHighContrast);
+  // Handle voice-over functionality
+  const handleVoiceOver = () => {
+    if (window.speechSynthesis) {
+      const speech = new SpeechSynthesisUtterance();
+      if (!isSpeaking) {
+        // Read each cart item aloud
+        let cartDescription = 'Your cart contains: ';
+        cartData.forEach(item => {
+          const productData = products.find(product => product._id === item._id);
+          cartDescription += `${item.quantity} units of ${productData.name}, size ${item.size}. `;
+        });
+        speech.text = cartDescription;
+        window.speechSynthesis.speak(speech);
+        setIsSpeaking(true);
+      } else {
+        window.speechSynthesis.cancel();
+        setIsSpeaking(false);
+      }
+    } else {
+      alert("Your browser doesn't support speech synthesis.");
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (isSpeaking) window.speechSynthesis.cancel();
+    };
+  }, [isSpeaking]);
 
   return (
     <div className="container mx-auto py-10 px-6">
-      {/* High Contrast Toggle Button */}
-      <div className="flex justify-end mb-6">
-        <button 
-          onClick={toggleContrast} 
-          className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          aria-pressed={isHighContrast ? "true" : "false"}
-          aria-label="Toggle high contrast mode"
-        >
-          {isHighContrast ? 'Normal Mode' : 'High Contrast Mode'}
-        </button>
-      </div>
+      <div className="flex justify-between items-center mb-6">
+        <div className='text-center text-2xl'>
+          <Title text1={'YOUR'} text2={'CART'} />
+        </div>
 
-      <div className='text-center text-2xl mb-10'>
-        <Title text1={'YOUR'} text2={'CART'} />
+        {/* Voice Over Button */}
+        <button
+          onClick={handleVoiceOver}
+          className={`p-3 rounded-full shadow-md transition duration-300 transform hover:scale-105 ${
+            isSpeaking ? 'bg-red-500 hover:bg-red-600' : 'bg-indigo-500 hover:bg-indigo-600'
+          } text-white`}
+          aria-label={isSpeaking ? 'Stop Voice Over' : 'Start Voice Over'}
+        >
+          {isSpeaking ? <FaVolumeMute size={24} /> : <FaVolumeUp size={24} />}
+        </button>
       </div>
 
       <div className='flex flex-col lg:flex-row gap-8'>
@@ -57,7 +85,7 @@ const Cart = () => {
               return (
                 <div 
                   key={index} 
-                  className={`rounded-lg shadow-lg p-4 flex justify-between items-center gap-4 hover:shadow-xl transition-shadow duration-300 ${isHighContrast ? 'bg-black text-white' : 'bg-white text-gray-800'}`}
+                  className={`rounded-lg shadow-lg p-4 flex justify-between items-center gap-4 hover:shadow-xl transition-shadow duration-300 bg-white text-gray-800`}
                   aria-label={`Cart item: ${productData.name}, size ${item.size}, quantity ${item.quantity}, price ${currency}${productData.price}`}>
                   
                   {/* Product Image and Info */}
@@ -67,10 +95,10 @@ const Cart = () => {
                       <p className='text-lg font-semibold' aria-label={`Product: ${productData.name}`}>{productData.name}</p>
                       {/* Price and Size */}
                       <div className='flex items-center gap-3 mt-1'>
-                        <p className={`text-xl font-bold ${isHighContrast ? 'text-white' : 'text-gray-800'}`} aria-label={`Price: ${currency}${productData.price}`}>
+                        <p className='text-xl font-bold text-gray-800' aria-label={`Price: ${currency}${productData.price}`}>
                           {currency} {productData.price}.00
                         </p>
-                        <p className={`px-3 py-1 border border-gray-300 text-sm ${isHighContrast ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-600'} rounded-md`} aria-label={`Size: ${item.size}`}>
+                        <p className='px-3 py-1 border border-gray-300 text-sm bg-gray-100 text-gray-600 rounded-md' aria-label={`Size: ${item.size}`}>
                           {item.size}
                         </p>
                       </div>
@@ -83,7 +111,7 @@ const Cart = () => {
                     <div className='flex items-center border border-gray-300 rounded-md'>
                       <button 
                         onClick={() => updateQuantity(item._id, item.size, item.quantity - 1)} 
-                        className={`px-3 py-1 ${isHighContrast ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-600'} hover:bg-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                        className={`px-3 py-1 bg-gray-200 text-gray-600 hover:bg-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
                         aria-label="Decrease quantity"
                         aria-controls={`quantity-${index}`}
                       >
@@ -93,14 +121,14 @@ const Cart = () => {
                         id={`quantity-${index}`}
                         aria-label="Quantity"
                         onChange={(e) => e.target.value === '' || e.target.value === '0' ? null : updateQuantity(item._id, item.size, Number(e.target.value))} 
-                        className={`w-12 px-2 py-1 text-center ${isHighContrast ? 'text-white bg-gray-800' : 'text-gray-800'} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`} 
+                        className='w-12 px-2 py-1 text-center text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all' 
                         type="number" 
                         min={1} 
                         value={item.quantity} 
                       />
                       <button 
                         onClick={() => updateQuantity(item._id, item.size, item.quantity + 1)} 
-                        className={`px-3 py-1 ${isHighContrast ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-600'} hover:bg-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                        className={`px-3 py-1 bg-gray-200 text-gray-600 hover:bg-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
                         aria-label="Increase quantity"
                         aria-controls={`quantity-${index}`}
                       >
@@ -111,7 +139,7 @@ const Cart = () => {
                     {/* Remove Button */}
                     <img 
                       onClick={() => updateQuantity(item._id, item.size, 0)} 
-                      className={`w-6 h-6 cursor-pointer hover:opacity-80 transition-opacity duration-300 ${isHighContrast ? 'filter invert' : ''}`} 
+                      className='w-6 h-6 cursor-pointer hover:opacity-80 transition-opacity duration-300' 
                       src={assets.bin_icon} 
                       alt="Remove item"
                       aria-label={`Remove ${productData.name}`}
@@ -128,7 +156,13 @@ const Cart = () => {
         <div className='w-full sm:w-[450px]'>
           <CartTotal />
           <div className=' w-full text-end'>
-            <button onClick={() => navigate('/place-order')} className='bg-black text-white text-sm my-8 px-8 py-3'>PROCEED TO CHECKOUT</button>
+          <button 
+  onClick={() => navigate('/place-order')} 
+  className='bg-[#124271] text-white text-sm my-8 px-8 py-3 rounded-lg shadow-md hover:bg-[#0f365b] transition-colors duration-300 transform hover:scale-105'
+>
+  PROCEED TO CHECKOUT
+</button>
+
           </div>
         </div>
       </div>
