@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const LiveAssistanceStart = () => {
   const navigate = useNavigate();
@@ -63,6 +64,30 @@ const LiveAssistanceStart = () => {
     }
   `;
 
+  const handleStartLiveAssistance = async () => {
+    // Get name and email from localStorage
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const { name, email } = userInfo;
+
+    try {
+      // Send the name, email, and accept=false to the backend
+      const response = await axios.post('http://localhost:4000/api/assist/', {
+        name,
+        email,
+        accept: false, // success state is false when starting assistance
+      });
+      navigate('/live-wait');
+      if (response.data.success) {
+        // Navigate to the live waiting screen if the request is successful
+        navigate('/live-wait');
+      } else {
+        console.error('Failed to start live assistance:', response.data.message);
+      }
+    } catch (error) {
+      console.error('Error starting live assistance:', error);
+    }
+  };
+
   return (
     <div
       className="min-h-screen flex flex-col justify-center items-center px-4 py-8 relative overflow-hidden bg-gradient-to-br from-lightblue-100 to-blue-300 text-gray-800"
@@ -104,7 +129,7 @@ const LiveAssistanceStart = () => {
       <div className="flex flex-col md:flex-row gap-6">
         {/* Start Live Assistance Now Button */}
         <button
-          onClick={() => navigate('/live-wait')}
+          onClick={handleStartLiveAssistance}
           className="w-full md:w-auto px-12 py-4 bg-darkblue-500 text-white rounded-full text-lg font-bold relative overflow-hidden group shadow-lg transition-transform transform hover:scale-105"
           style={{ backgroundColor: '#003366', boxShadow: '0 8px 20px rgba(0, 0, 0, 0.2)' }}
         >

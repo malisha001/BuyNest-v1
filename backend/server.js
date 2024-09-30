@@ -7,6 +7,7 @@ import userRouter from './routes/userRoute.js'
 import productRouter from './routes/productRoute.js'
 import cartRouter from './routes/cartRoute.js'
 import orderRouter from './routes/orderRoute.js'
+import assistRouter from './routes/assistRoute.js'
 
 
 // App Config
@@ -24,7 +25,8 @@ app.use('/api/user',userRouter)
 app.use('/api/product',productRouter)
 app.use('/api/cart',cartRouter)
 app.use('/api/order',orderRouter)
-
+//list assist
+app.use('/api/assist',assistRouter)
 
 app.get('/',(req,res)=>{
     res.send("API Working")

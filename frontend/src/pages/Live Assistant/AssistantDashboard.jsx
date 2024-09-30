@@ -1,15 +1,7 @@
 import { useState, useEffect } from 'react';
-import { FaUser, FaClock, FaSearch, FaPowerOff } from 'react-icons/fa';
+import { FaClock, FaSearch, FaPowerOff } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
-
-const sampleRequests = [
-  { id: 1, name: 'John Doe', time: '2 min ago', type: 'Checkout Assistance' },
-  { id: 2, name: 'Jane Smith', time: '5 min ago', type: 'Product Details' },
-];
-
-const sampleActiveSessions = [
-  { id: 3, name: 'Chris Adams', time: '15 min', status: 'Active' },
-];
+import axios from 'axios'; // Ensure axios is imported
 
 const AssistantDashboard = () => {
   const [availability, setAvailability] = useState(false); // Track availability status
@@ -19,17 +11,44 @@ const AssistantDashboard = () => {
   const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
-    // Simulate fetching session requests and active sessions
-    setSessionRequests(sampleRequests);
-    setActiveSessions(sampleActiveSessions);
+    const fetchSessionRequests = async () => {
+      try {
+        const response = await axios.get('http://localhost:4000/api/assist'); // Replace with your backend URL
+        if (response.data.success) {
+          setSessionRequests(response.data.assist); // Assuming your backend returns { success: true, assist: [...] }
+        } else {
+          console.error('Failed to fetch session requests:', response.data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching session requests:', error);
+      }
+    };
+
+    const fetchActiveSessions = async () => {
+      // If you have an endpoint for active sessions, implement this function accordingly
+      try {
+        const response = await axios.get('http://localhost:4000/api/active-sessions'); // Replace with your backend URL
+        if (response.data.success) {
+          setActiveSessions(response.data.sessions); // Assuming your backend returns { success: true, sessions: [...] }
+        } else {
+          console.error('Failed to fetch active sessions:', response.data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching active sessions:', error);
+      }
+    };
+
+    fetchSessionRequests();
+    fetchActiveSessions();
   }, []);
 
   const toggleAvailability = () => {
     setAvailability(!availability);
   };
 
-  const handleAccept = () => {
-    navigate('/assis-live'); // Navigate to /assis-live
+  const handleAccept = (request) => {
+    // Pass the selected request to the live assistance screen
+    navigate('/assis-live', { state: { request } }); // Pass the request as state if needed
   };
 
   return (
@@ -67,7 +86,7 @@ const AssistantDashboard = () => {
               <ul className="space-y-3">
                 {sessionRequests.map((request) => (
                   <li
-                    key={request.id}
+                    key={request._id} // Use _id if you're using MongoDB
                     className={`rounded-xl p-3 flex justify-between items-center shadow-md hover:shadow-lg transition-shadow duration-300 transform hover:translate-y-1 ${availability ? 'bg-gray-700' : 'bg-gray-100'}`}
                   >
                     <div>
@@ -79,7 +98,7 @@ const AssistantDashboard = () => {
                       <span className={`${availability ? 'text-gray-400' : 'text-gray-600'}`}>{request.time}</span>
                     </div>
                     <button 
-                      onClick={handleAccept} // Attach the onClick handler to navigate
+                      onClick={() => handleAccept(request)} // Pass the request to the handler
                       className={`ml-4 px-5 py-2 rounded-full ${availability ? 'bg-blue-500 hover:bg-blue-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'} font-semibold shadow-lg transition-transform transform hover:scale-105`}
                     >
                       Accept

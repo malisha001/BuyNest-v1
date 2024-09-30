@@ -23,6 +23,7 @@ const Navbar = () => {
     if (command === 'logout') {
       navigate('/login');
       localStorage.removeItem('token');
+      localStorage.removeItem('userInfo');
       setToken('');
       setCartItems({});
     }
