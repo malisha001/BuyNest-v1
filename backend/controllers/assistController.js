@@ -29,18 +29,5 @@ const requestAssist = async (req, res) => {
 export { getAssist, requestAssist }
 
 //update assist request accept status 
-const updateAssist = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { accept } = req.body;
-        const assist = await assistModel.findById(id);
-        assist.accept = accept;
-        await assist.save();
-        res.json({ success: true, message: 'Assist request updated successfully' });
-    }
-    catch (error) {
-        console.log(error);
-        res.json({ success: false, message: error.message });
-    }
-}
+
 
