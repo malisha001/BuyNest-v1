@@ -10,6 +10,7 @@ import Cart from './pages/Cart';
 import Login from './pages/Login';
 import PlaceOrder from './pages/PlaceOrder';
 import Orders from './pages/Orders';
+import Refund from './pages/Refund';
 import LiveAssistanceStart from './pages/Live Assistant/LiveAssistanceStart';
 import WaitingForConnection from './pages/Live Assistant/WaitingForConnection';
 import FloatingChat from './pages/Live Assistant/FloatingChat';
@@ -82,6 +83,7 @@ const App = () => {
             <Route path="/profile" element={<Profile />} />
             <Route path="/place-order" element={<PlaceOrder />} />
             <Route path="/orders" element={<Orders />} />
+            <Route path="/refund/:orderId" element={<Refund />} />
             <Route path='/track-order/:orderId' element={<TrackOrder />} />
             <Route path="/live-start" element={<LiveAssistanceStart />} />
             <Route path="/live-wait" element={<WaitingForConnection />} />

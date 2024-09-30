@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams,useNavigate } from 'react-router-dom';
 import { ShopContext } from '../context/ShopContext'; 
 import axios from 'axios';
 
@@ -13,6 +13,7 @@ const TrackOrder = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false); 
   const [currentItemId, setCurrentItemId] = useState(null); 
   const [selectedSize, setSelectedSize] = useState(''); 
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
@@ -55,8 +56,8 @@ const TrackOrder = () => {
     return statusMap[status] || 1;
   };
 
-  const handleCancelRequest = () => {
-    
+  const handleCancelRequest = (orderid) => {
+    navigate(`/refund/${orderid}`);
   };
 
   const handleReorder = () => {
@@ -137,7 +138,7 @@ const TrackOrder = () => {
           <div className="flex space-x-4">
             {orderDetails.status !== 'Shipped' && orderDetails.status !== 'Delivered' && (
               <button
-                onClick={handleCancelRequest}
+                onClick={() => handleCancelRequest(orderId)}
                 className="px-4 py-2 bg-red-500 text-white rounded-full shadow-md hover:bg-red-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-red-400"
               >
                 Request to Cancel

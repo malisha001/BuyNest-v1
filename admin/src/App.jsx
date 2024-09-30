@@ -5,7 +5,7 @@ import { Routes, Route } from 'react-router-dom'
 import Add from './pages/Add'
 import List from './pages/List'
 import Orders from './pages/Orders'
-import OrderCancellation from './pages/OrderCancellation'
+import Refund from './pages/Refund'
 import AdminHomePage from './pages/AdminHomePage'
 import Login from './components/Login'
 import { ToastContainer } from 'react-toastify';
@@ -38,7 +38,7 @@ const App = () => {
                 <Route path='/add' element={<Add token={token} />} />
                 <Route path='/list' element={<List token={token} />} />
                 <Route path='/orders' element={<Orders token={token} />} />
-                <Route path='/orders/cancel' element={<OrderCancellation token={token} />} />
+                <Route path='/refund' element={<Refund token={token} />} />
               </Routes>
             </div>
           </div>

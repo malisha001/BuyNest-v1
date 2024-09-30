@@ -1,5 +1,6 @@
 import React from 'react';
-import { FaPlus, FaList, FaBox, FaUserFriends, FaUsers, FaTags, FaStore } from 'react-icons/fa'; // Icons for sidebar items
+import { FaPlus, FaList, FaBox, FaUserFriends, FaUsers, FaTags, FaStore, } from 'react-icons/fa'; // Icons for sidebar items
+import { RiRefund2Fill } from "react-icons/ri"; // Icon for Refund
 
 const Sidebar = () => {
     return (
@@ -19,8 +20,8 @@ const Sidebar = () => {
                     <a href="/orders" className="text-gray-800 font-semibold text-base">Orders</a>
                 </li>
                 <li className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition transform hover:scale-105">
-                    <FaBox className="text-gray-700" />
-                    <a href="/orders/cancel" className="text-gray-800 font-semibold text-base">Deleting Orders</a>
+                    <RiRefund2Fill className="text-gray-700" />
+                    <a href="/refund" className="text-gray-800 font-semibold text-base">Refunds</a>
                 </li>
 
                 {/* New Sections */}
