@@ -36,8 +36,8 @@ const Login = () => {
         const response = await axios.post(backendUrl + '/api/user/login', { email, password });
         if (response.data.success) {
           setToken(response.data.token);
-
-          const userInfo = { email: response.data.email, name: response.data.name,token:response.data.token };
+          localStorage.setItem('token', response.data.token);
+          const userInfo = { email: response.data.email, name: response.data.name,token:response.data.token, id: response.data.id };
           console.log(userInfo);
           localStorage.setItem('userInfo', JSON.stringify(userInfo));
           

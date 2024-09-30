@@ -1,18 +1,11 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const assistSchema = new mongoose.Schema({
-    name: { 
-        type: String,
-        required: true 
-    },
-    email: { 
-        type: String, 
-        required: true,  
-    },
-    accept: { 
-        type: Boolean, 
-    }
-},)
+    userId: { type: String, required: true },  // Add userId field
+    name: { type: String, required: true },
+    email: { type: String, required: true },
+    accept: { type: Boolean, default: false }
+}, { timestamps: true });
 
-const assistModel = mongoose.models.assist || mongoose.model('assist',assistSchema);
-export default assistModel
+const assistModel = mongoose.model('Assist', assistSchema);
+export default assistModel;
