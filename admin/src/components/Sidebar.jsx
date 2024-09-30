@@ -18,6 +18,10 @@ const Sidebar = () => {
                     <FaBox className="text-gray-700" />
                     <a href="/orders" className="text-gray-800 font-semibold text-base">Orders</a>
                 </li>
+                <li className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition transform hover:scale-105">
+                    <FaBox className="text-gray-700" />
+                    <a href="/orders/cancel" className="text-gray-800 font-semibold text-base">Deleting Orders</a>
+                </li>
 
                 {/* New Sections */}
                 <li className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition transform hover:scale-105">

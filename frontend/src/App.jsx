@@ -25,6 +25,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import Profile from './pages/Profile';
 
 const App = () => {
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
@@ -78,6 +79,7 @@ const App = () => {
             <Route path="/product/:productId" element={<Product />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/place-order" element={<PlaceOrder />} />
             <Route path="/orders" element={<Orders />} />
             <Route path='/track-order/:orderId' element={<TrackOrder />} />

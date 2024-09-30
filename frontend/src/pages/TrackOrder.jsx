@@ -56,7 +56,7 @@ const TrackOrder = () => {
   };
 
   const handleCancelRequest = () => {
-    alert("Cancel request sent!");
+    
   };
 
   const handleReorder = () => {
