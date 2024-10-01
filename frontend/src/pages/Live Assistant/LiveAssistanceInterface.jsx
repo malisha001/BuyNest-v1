@@ -1,166 +1,140 @@
 import React, { useState, useEffect } from 'react';
-import { FaMicrophone, FaPaperPlane, FaShoppingCart, FaFlag, FaTimes } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { io } from 'socket.io-client';
+import { FaMicrophone, FaPlay, FaCartArrowDown, FaShoppingCart, FaFlag, FaTimes } from 'react-icons/fa';
+import { useLocation, useNavigate } from 'react-router-dom';
+import axios from 'axios'; // For fetching product details and chat messages
+import { io } from 'socket.io-client'; // Import Socket.IO client
 
 const LiveAssistanceInterface = () => {
+  const location = useLocation();
+  const { cart = {}, request } = location.state || {};
   const [products, setProducts] = useState({});
-  const [currentCart, setCurrentCart] = useState({});
-  const [voiceMessages, setVoiceMessages] = useState([]); // To store all messages (user + support)
+  const [currentCart, setCurrentCart] = useState(cart);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [voiceMessages, setVoiceMessages] = useState([]);
   const [lightMode, setLightMode] = useState(false);
-  const [typedMessage, setTypedMessage] = useState(''); // Support's message input
+  const [chatMessages, setChatMessages] = useState([]); // Store chat messages
+  const [newMessage, setNewMessage] = useState(''); // New message input
   const socket = io('http://localhost:4000');
-  const navigate = useNavigate();
-
-  // Fetch user info from localStorage
-  const userInfo = JSON.parse(localStorage.getItem('userInfo')); // Retrieve user info from localStorage
-  const userId = userInfo?.id; // Get userId from userInfo object
-  const userEmail = userInfo?.email;
-  const userName = userInfo?.name;
 
   useEffect(() => {
-    if (!userId) {
-      console.error('User info not found in localStorage');
-      return;
-    }
-
+    // Fetch product details for each item in the cart when the component mounts
     const fetchProductDetails = async () => {
       const productDetails = {};
-      try {
-        const response = await axios.get(`http://localhost:4000/api/cart/${userId}`);
-        const cartData = response.data.cart; // Assuming cart is returned here
-        setCurrentCart(cartData);
-
-        for (const itemId of Object.keys(cartData)) {
-          const productResponse = await axios.get(`http://localhost:4000/api/product/${itemId}`);
-          productDetails[itemId] = productResponse.data.product;
+      for (const itemId of Object.keys(currentCart)) {
+        try {
+          const response = await axios.get(`http://localhost:4000/api/product/${itemId}`);
+          if (response.data.success) {
+            productDetails[itemId] = response.data.product;
+          }
+        } catch (error) {
+          console.error(`Error fetching product ${itemId}:`, error);
         }
-        setProducts(productDetails);
-      } catch (error) {
-        console.error('Error fetching cart or product details:', error);
       }
+      setProducts(productDetails);
     };
 
-    const fetchUserMessages = async () => {
+    // Fetch chat messages when the component mounts
+    const fetchChatMessages = async () => {
       try {
-        const response = await axios.get(`http://localhost:4000/api/messages/${userId}`);
-        setVoiceMessages(response.data.messages); // All messages from both user and support
+        const response = await axios.get(`http://localhost:4000/api/messages/${request.userId}`);
+        if (response.data.success) {
+          setChatMessages(response.data.messages);
+        }
       } catch (error) {
-        console.error('Error fetching user messages:', error);
+        console.error('Error fetching chat messages:', error);
       }
     };
 
     fetchProductDetails();
-    fetchUserMessages();
+    fetchChatMessages();
 
-    // Socket.IO for real-time messages
-    socket.emit('join_room', userId); // Join the room for the user
-
-    socket.on('new_message', (newMessage) => {
-      setVoiceMessages((prevMessages) => [...prevMessages, newMessage]);
-    });
-
+    // Listen for cart updates in real-time
     socket.on('cart_updated', (updatedCart) => {
       setCurrentCart(updatedCart);
     });
 
-    const intervalId = setInterval(fetchUserMessages, 2000);
-
     return () => {
-      clearInterval(intervalId); // Clear the interval on component unmount
-      socket.off('new_message');
       socket.off('cart_updated');
     };
-  }, [userId]);
+  }, [currentCart, request.userId]);
 
+  // Toggle voice chat (simulating start and stop of voice interaction)
+  const toggleVoiceChat = () => {
+    setIsSpeaking(!isSpeaking);
+  };
+
+  // Handle sending a new message
   const handleSendMessage = async () => {
-    if (typedMessage.trim() === '') return;
+    if (newMessage.trim() === '') return;
 
-    const newMessage = {
-      userId,
-      userEmail,
-      content: typedMessage,
-      from: 'assistant',
+    const messageData = {
+      userId: request.userId,
+      userEmail: request.userEmail,
+      content: newMessage,
+      from: 'assistant', // Since this is the assistant's interface
     };
 
     try {
-      await axios.post('http://localhost:4000/api/messages', newMessage);
-      setVoiceMessages((prevMessages) => [...prevMessages, newMessage]);
-      setTypedMessage(''); // Clear the input after sending
+      const response = await axios.post('http://localhost:4000/api/messages', messageData);
+      if (response.data.success) {
+        setChatMessages([...chatMessages, response.data.message]); // Update chat messages
+        setNewMessage(''); // Clear the input field
+      }
     } catch (error) {
       console.error('Error sending message:', error);
     }
-  };
-
-  const endSession = () => {
-    setLightMode(true); // Change to light mode after ending session
-    navigate('/assistant-dashboard'); // Redirect back to the dashboard
   };
 
   return (
     <div className={`min-h-screen py-8 px-4 lg:px-16 transition-all duration-300 ${lightMode ? 'bg-white' : 'bg-gray-100'}`}>
       {/* Header */}
       <header className={`flex justify-between items-center mb-8 ${lightMode ? 'bg-white' : 'bg-gradient-to-r from-gray-100 via-white to-gray-200'} p-6 rounded-t-2xl shadow-xl`}>
-        <h1 className={`text-4xl font-bold ${lightMode ? 'text-gray-800' : 'text-gray-800'} drop-shadow-md`}>
-          Live Assistance Interface
-        </h1>
+        <h1 className={`text-4xl font-bold ${lightMode ? 'text-gray-800' : 'text-gray-800'} drop-shadow-md`}>Live Assistance Interface</h1>
         <div className="text-lg text-gray-600">
-          User: <span className={`font-bold ${lightMode ? 'text-black' : 'text-gray-800'}`}>{userName}</span>
+          User: <span className={`font-bold ${lightMode ? 'text-black' : 'text-gray-800'}`}>{request?.name}</span>
         </div>
       </header>
 
+      {/* Main Content */}
       <main className={`p-6 rounded-2xl shadow-2xl transition-all duration-300 ${lightMode ? 'bg-gray-100 text-gray-800' : 'bg-gradient-to-br from-gray-800 via-gray-900 to-black text-gray-200'}`}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-          {/* Voice Chat Section */}
-          <section className={`relative rounded-2xl p-6 shadow-2xl ${lightMode ? 'bg-gray-50' : 'bg-gray-800'}`}>
+          
+          {/* Voice Chat and Messages Section */}
+          <section className={`relative rounded-2xl p-6 shadow-2xl hover:shadow-xl transition-shadow duration-300 ${lightMode ? 'bg-white' : 'bg-white/10'}`}>
             <div className="flex justify-between items-center mb-4">
-              <h2 className={`text-3xl font-bold ${lightMode ? 'text-gray-800' : 'text-white'}`}>Voice Chat</h2>
+              <h2 className={`text-3xl font-bold ${lightMode ? 'text-gray-800' : 'text-white'}`}>Chat Messages</h2>
+              <span className="absolute top-2 right-2 animate-pulse bg-red-500 text-white px-4 py-2 rounded-full font-semibold text-sm shadow-md">
+                Visually Impaired
+              </span>
             </div>
 
-            {/* Display Messages Section */}
-            <div className={`flex flex-col space-y-4 h-72 overflow-auto p-4 rounded-xl ${lightMode ? 'bg-white' : 'bg-gray-700'}`}>
-              {voiceMessages.map((msg, index) => (
+            {/* Chat Messages */}
+            <div className="flex flex-col space-y-4 h-64 overflow-y-auto">
+              {chatMessages.map((msg) => (
                 <div
-                  key={index}
-                  className={`flex ${msg.from === 'assistant' ? 'justify-start' : 'justify-end'}`}
+                  key={msg._id}
+                  className={`p-4 rounded-xl shadow-md ${msg.from === 'assistant' ? 'bg-blue-500' : 'bg-green-500'} ${lightMode ? 'text-gray-800' : 'text-white'}`}
                 >
-                  <div
-                    className={`relative max-w-xs p-3 rounded-xl text-sm shadow-md 
-                      ${msg.from === 'assistant' ? 
-                        'bg-gray-200 text-gray-900' : 
-                        'bg-green-500 text-white'} 
-                      ${msg.from === 'assistant' ? 'rounded-tl-none' : 'rounded-tr-none'}
-                      ${lightMode ? 'shadow-lg' : ''}`}
-                    style={{ 
-                      border: '1px solid rgba(0, 0, 0, 0.1)', // Soft inner border
-                      boxShadow: 'inset 0 0 5px rgba(0, 0, 0, 0.1)', // Inner shadow for depth
-                    }}
-                  >
-                    {msg.content}
-                    {/* Adding an extra inner decorative element */}
-                    <span className="absolute inset-0 rounded-xl border border-white opacity-20 pointer-events-none"></span>
-                  </div>
+                  <div className="text-sm">{msg.content}</div>
+                  <div className="text-xs mt-2">{new Date(msg.createdAt).toLocaleString()}</div>
                 </div>
               ))}
             </div>
 
-            {/* Message input */}
-            <div className="mt-4 flex items-center">
-              <button className="bg-gray-200 text-gray-700 rounded-full p-3 mr-3">
-                <FaMicrophone />
-              </button>
+            {/* Message Input */}
+            <div className="flex mt-4">
               <input
                 type="text"
-                value={typedMessage}
-                onChange={(e) => setTypedMessage(e.target.value)}
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
                 placeholder="Type a message..."
-                className={`flex-1 px-4 py-2 rounded-full focus:outline-none 
-                  ${lightMode ? 'bg-gray-100 text-gray-800' : 'bg-gray-700 text-white'}`}
+                className="w-full p-3 rounded-l-lg border-gray-300"
               />
-              <button onClick={handleSendMessage} className="ml-3 bg-blue-600 text-white rounded-full p-3">
-                <FaPaperPlane />
+              <button
+                onClick={handleSendMessage}
+                className="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-r-lg"
+              >
+                Send
               </button>
             </div>
           </section>
@@ -179,7 +153,7 @@ const LiveAssistanceInterface = () => {
                   Object.entries(sizes).map(([size, quantity], index) => (
                     <li
                       key={index}
-                      onClick={() => window.open(`/product/${itemId}`, '_blank')} // Open product page
+                      onClick={() => window.open(`/product/${itemId}`, '_blank')}
                       className={`rounded-xl p-4 flex justify-between items-center shadow-md ${lightMode ? 'bg-gray-100' : 'bg-white/10'} hover:shadow-lg transition-shadow duration-300 cursor-pointer`}
                     >
                       <div>
@@ -189,11 +163,14 @@ const LiveAssistanceInterface = () => {
                         <p className={`text-sm ${lightMode ? 'text-gray-600' : 'text-gray-400'}`}>Size: {size}</p>
                         <p className={`text-sm ${lightMode ? 'text-gray-600' : 'text-gray-400'}`}>Quantity: {quantity}</p>
                       </div>
+                      <div className="text-gray-400">
+                        <FaCartArrowDown />
+                      </div>
                     </li>
                   ))
                 ))
               ) : (
-                <p className="text-gray-400">No items in the cart.</p>
+                <p className={`text-gray-400`}>No items in the cart.</p>
               )}
             </ul>
           </section>
