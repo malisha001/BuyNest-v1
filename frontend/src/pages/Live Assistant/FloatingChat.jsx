@@ -26,36 +26,33 @@ const FloatingChat = () => {
     }
   }, [transcript]);
 
-  // Fetch messages when component mounts
-  useEffect(() => {
-    const fetchMessages = async () => {
-      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-      
-      if (!userInfo || !userInfo.id || !userInfo.email) {
-        console.error('User information not found in localStorage');
-        return;
-      }
+  // Function to fetch messages
+  const fetchMessages = async () => {
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    
+    if (!userInfo || !userInfo.id || !userInfo.email) {
+      console.error('User information not found in localStorage');
+      return;
+    }
 
-      try {
-        const response = await axios.get(`http://localhost:4000/api/messages/${userInfo.id}`);
-        setMessages(response.data.messages);
-      } catch (error) {
-        console.error('Failed to fetch messages:', error);
-      }
-    };
-
-    fetchMessages();
-  }, []);
-
-  const handlePlayPause = (id) => {
-    if (audioRef.current && !audioRef.current.paused) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      audioRef.current.play();
-      setIsPlaying(true);
+    try {
+      const response = await axios.get(`http://localhost:4000/api/messages/${userInfo.id}`);
+      setMessages(response.data.messages);
+    } catch (error) {
+      console.error('Failed to fetch messages:', error);
     }
   };
+
+  // Fetch messages every 2 seconds
+  useEffect(() => {
+    fetchMessages(); // Initial fetch
+
+    const intervalId = setInterval(fetchMessages, 2000); // Refresh messages every 2 seconds
+
+    return () => {
+      clearInterval(intervalId); // Cleanup interval on unmount
+    };
+  }, []); // Empty dependency array to run on mount
 
   // Function to handle sending the message to the backend
   const handleSendMessage = async () => {
@@ -78,7 +75,7 @@ const FloatingChat = () => {
     try {
       await axios.post('http://localhost:4000/api/messages', newMessage);
       setMessages((prevMessages) => [...prevMessages, newMessage]);
-      setTypedMessage('');
+      setTypedMessage(''); // Clear the input after sending
     } catch (error) {
       console.error('Failed to send message:', error);
     }
