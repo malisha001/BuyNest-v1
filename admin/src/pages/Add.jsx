@@ -10,6 +10,7 @@ const Add = ({ token }) => {
   const [image3, setImage3] = useState(false);
   const [image4, setImage4] = useState(false);
   const [name, setName] = useState("");
+  const [nameError, setNameError] = useState(""); // State for validation error message
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("Men");
@@ -17,8 +18,28 @@ const Add = ({ token }) => {
   const [bestseller, setBestseller] = useState(false);
   const [sizes, setSizes] = useState([]);
 
+  // Function to handle name input change and validation
+  const handleNameChange = (e) => {
+    const value = e.target.value;
+    const regex = /^[a-zA-Z\s]*$/; // Regular expression to allow only letters and spaces
+
+    if (regex.test(value)) {
+      setName(value);
+      setNameError(""); // Clear error if valid
+    } else {
+      setNameError("Only letters are allowed in the product name.");
+    }
+  };
+
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+
+    // If there's a name error, prevent form submission
+    if (nameError) {
+      toast.error("Please fix the errors before submitting.");
+      return;
+    }
+
     try {
       const formData = new FormData();
       formData.append("name", name);
@@ -70,7 +91,15 @@ const Add = ({ token }) => {
 
       <div className='w-full'>
         <p className='mb-2 font-semibold text-gray-700 text-lg'>Product Name</p>
-        <input onChange={(e) => setName(e.target.value)} value={name} className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-gray-500 focus:ring-2 focus:ring-gray-200 transition' type="text" placeholder='Enter product name' required />
+        <input 
+          onChange={handleNameChange} 
+          value={name} 
+          className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-gray-500 focus:ring-2 focus:ring-gray-200 transition' 
+          type="text" 
+          placeholder='Enter product name' 
+          required 
+        />
+        {nameError && <p className='text-red-500 text-sm'>{nameError}</p>}
       </div>
 
       <div className='w-full'>
@@ -98,9 +127,18 @@ const Add = ({ token }) => {
         </div>
 
         <div className='w-full'>
-          <p className='mb-2 font-semibold text-gray-700 text-lg'>Price ($)</p>
-          <input onChange={(e) => setPrice(e.target.value)} value={price} className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-gray-500 focus:ring-2 focus:ring-gray-200 transition' type="number" placeholder='Enter price' />
-        </div>
+  <p className='mb-2 font-semibold text-gray-700 text-lg'>Price ($)</p>
+  <input 
+    onChange={(e) => setPrice(e.target.value)} 
+    value={price} 
+    className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-gray-500 focus:ring-2 focus:ring-gray-200 transition' 
+    type="number" 
+    placeholder='Enter price' 
+    min="0"  // Set the minimum value to 0
+    required 
+  />
+</div>
+
       </div>
 
       <div className='w-full'>
