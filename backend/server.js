@@ -8,6 +8,7 @@ import productRouter from './routes/productRoute.js';
 import cartRouter from './routes/cartRoute.js';
 import orderRouter from './routes/orderRoute.js';
 import assistRouter from './routes/assistRoute.js';
+import messageRoutes from './routes/messageRoute.js';
 import http from 'http'; // Import http module
 import { Server } from 'socket.io'; // Import Socket.io
 
@@ -34,6 +35,8 @@ app.use('/api/product', productRouter);
 app.use('/api/cart', cartRouter);
 app.use('/api/order', orderRouter);
 app.use('/api/assist', assistRouter);
+//message route
+app.use('/api/messages', messageRoutes);
 
 app.get('/', (req, res) => {
     res.send("API Working");

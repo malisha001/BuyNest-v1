@@ -1,20 +1,53 @@
 import React, { useContext, useEffect, useState, useRef } from 'react';
 import { ChatContext } from '../../context/ChatContext';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios'; // Import Axios for making HTTP requests
+import useSpeechToText from '../../hooks/useSpeechToText'; // Import the custom hook
 
 const FloatingChat = () => {
   const { isChatOpen, toggleChat, endSession } = useContext(ChatContext);
   const navigate = useNavigate();
-  const [messages, setMessages] = useState([
-    { id: 1, from: 'assistant', audio: 'assistant-voice1.mp3', duration: '00:12' },
-    { id: 2, from: 'user', audio: 'user-voice1.mp3', duration: '00:15' },
-  ]); // Array to hold chat messages
-
+  const [messages, setMessages] = useState([]);
+  const [typedMessage, setTypedMessage] = useState(''); // New state for typed message
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef(null);
 
+  // Integrate the useSpeechToText hook
+  const { isListning, transcript, startListning, stopListning } = useSpeechToText({
+    lang: 'en-US',
+    continuous: false,
+    interimResults: false,
+  });
+
+  // Update the chat input with the transcribed text when available
+  useEffect(() => {
+    if (transcript) {
+      setTypedMessage(transcript); // Set the transcribed text in the chat input
+    }
+  }, [transcript]);
+
+  // Fetch messages when component mounts
+  useEffect(() => {
+    const fetchMessages = async () => {
+      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+      
+      if (!userInfo || !userInfo.id || !userInfo.email) {
+        console.error('User information not found in localStorage');
+        return;
+      }
+
+      try {
+        const response = await axios.get(`http://localhost:4000/api/messages/${userInfo.id}`);
+        setMessages(response.data.messages);
+      } catch (error) {
+        console.error('Failed to fetch messages:', error);
+      }
+    };
+
+    fetchMessages();
+  }, []);
+
   const handlePlayPause = (id) => {
-    // Handle play and pause behavior for individual voice messages
     if (audioRef.current && !audioRef.current.paused) {
       audioRef.current.pause();
       setIsPlaying(false);
@@ -24,9 +57,50 @@ const FloatingChat = () => {
     }
   };
 
+  // Function to handle sending the message to the backend
+  const handleSendMessage = async () => {
+    if (typedMessage.trim() === '') return;
+
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    
+    if (!userInfo || !userInfo.id || !userInfo.email) {
+      console.error('User information not found in localStorage');
+      return;
+    }
+
+    const newMessage = { 
+      userId: userInfo.id, 
+      userEmail: userInfo.email, 
+      from: 'user', 
+      content: typedMessage 
+    };
+
+    try {
+      await axios.post('http://localhost:4000/api/messages', newMessage);
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+      setTypedMessage('');
+    } catch (error) {
+      console.error('Failed to send message:', error);
+    }
+  };
+
+  // Function to read the last message aloud
+  const readLastMessage = () => {
+    if (messages.length === 0) {
+      console.log('No messages to read');
+      return;
+    }
+
+    const lastMessage = messages[messages.length - 1].content;
+
+    // Using the Web Speech API for text-to-speech
+    const speech = new SpeechSynthesisUtterance(lastMessage);
+    speech.lang = 'en-US'; // Set the language
+    window.speechSynthesis.speak(speech);
+  };
+
   return (
     <>
-      {/* Floating Chat Box */}
       {isChatOpen && (
         <div
           className="fixed bottom-4 right-4 w-80 p-6 bg-black bg-opacity-70 shadow-2xl rounded-3xl z-50"
@@ -43,15 +117,13 @@ const FloatingChat = () => {
             Live Voice Chat
           </h2>
 
-          {/* Voice Chat Area with Differentiated Background */}
+          {/* Message list */}
           <div className="mb-6 h-40 overflow-y-auto flex flex-col gap-4 p-4 bg-gray-900 bg-opacity-50 rounded-xl" role="log">
-            {messages.slice(-2).map((message) => (
+            {messages.map((message, index) => (
               <div
-                key={message.id}
-                className={`flex ${
-                  message.from === 'user' ? 'justify-end' : 'justify-start'
-                }`}
-                aria-label={`Voice message from ${message.from === 'user' ? 'you' : 'the assistant'}`}
+                key={index}
+                className={`flex ${message.from === 'user' ? 'justify-end' : 'justify-start'}`}
+                aria-label={`Message from ${message.from === 'user' ? 'you' : 'the assistant'}`}
               >
                 <div
                   className={`relative rounded-lg p-2 w-max max-w-xs ${
@@ -59,62 +131,56 @@ const FloatingChat = () => {
                   }`}
                   style={{ borderRadius: '15px 15px 15px 5px' }}
                 >
-                  {/* Play/Pause Button and Waveform */}
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handlePlayPause(message.id)}
-                      className="focus:outline-none"
-                      aria-label={isPlaying ? 'Pause voice message' : 'Play voice message'}
-                    >
-                      {isPlaying ? (
-                        <svg
-                          className="w-5 h-5 text-white"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path fillRule="evenodd" d="M5 4a1 1 0 012 0v12a1 1 0 01-2 0V4zm8 0a1 1 0 112 0v12a1 1 0 11-2 0V4z" clipRule="evenodd" />
-                        </svg>
-                      ) : (
-                        <svg
-                          className="w-5 h-5 text-white"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M4.293 5.293a1 1 0 011.414 0L12 11.586V4a1 1 0 112 0v12a1 1 0 01-2 0v-7.586l-6.293 6.293a1 1 0 01-1.414-1.414l7-7a1 1 0 010-1.414l-7-7a1 1 0 00-1.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      )}
-                    </button>
-
-                    {/* Waveform Simulation */}
-                    <div className="w-24 h-4 bg-green-400 rounded-full relative overflow-hidden">
-                      <div className="absolute inset-0 bg-green-500 animate-pulse"></div>
-                    </div>
-                  </div>
-
+                  <p className="text-sm">{message.content || 'Audio message'}</p>
                   <audio ref={audioRef} src={message.audio} className="hidden" aria-hidden="true"></audio>
-                  <p className="text-xs text-right mt-1 text-gray-300" aria-hidden="true">{message.duration}</p>
+                  <p className="text-xs text-right mt-1 text-gray-300" aria-hidden="true">
+                    {message.duration}
+                  </p>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Record Audio Button */}
-          <div className="flex items-center justify-between mb-4">
-            <button
-              onClick={() => {}}
-              className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-full px-4 py-2 shadow-md w-full text-base font-semibold transition-all focus:outline-none hover:from-green-600 hover:to-green-700"
+          {/* Typing box for user input */}
+          <div className="mb-4 flex items-center">
+            <input
+              type="text"
+              value={typedMessage}
+              onChange={(e) => setTypedMessage(e.target.value)}
+              placeholder="Type a message..."
+              className="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none"
+            />
+            {/* Microphone button to trigger voice input */}
+            <button 
+              onClick={isListning ? stopListning : startListning} 
+              className={`ml-2 bg-${isListning ? 'red' : 'green'}-500 text-white rounded-full p-2 shadow-md`}
               aria-live="polite"
-              aria-label="Record your voice message"
+              aria-label="Start or stop voice input"
             >
-              Record Voice Message
+              🎤
             </button>
           </div>
+
+          {/* Send message button */}
+          <div className="flex items-center justify-between mb-4">
+            <button
+              onClick={handleSendMessage}
+              className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full px-4 py-2 shadow-md w-full text-base font-semibold transition-all focus:outline-none hover:from-blue-600 hover:to-blue-700"
+              aria-live="polite"
+              aria-label="Send your message"
+            >
+              Send Message
+            </button>
+          </div>
+
+          {/* Button to read the last message */}
+          <button
+            onClick={readLastMessage}
+            className="mb-4 px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-full font-bold w-full shadow-md hover:from-purple-600 hover:to-purple-700 transition-all focus:outline-none"
+            aria-label="Read last message aloud"
+          >
+            Read Last Message
+          </button>
 
           {/* End Session Button */}
           <button
@@ -128,7 +194,6 @@ const FloatingChat = () => {
             End Session
           </button>
 
-          {/* Close/Minimize Chat Button */}
           <button
             onClick={toggleChat}
             className="mt-4 text-blue-400 underline text-sm w-full text-center focus:outline-none hover:text-blue-500"
@@ -139,7 +204,6 @@ const FloatingChat = () => {
         </div>
       )}
 
-      {/* Floating button to reopen the chat if minimized */}
       {!isChatOpen && (
         <button
           onClick={toggleChat}
