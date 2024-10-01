@@ -35,9 +35,11 @@ const WaitingForConnection = () => {
 
   // Function to handle the accept and open chat
   const handleAccept = () => {
-    setIsChatOpen(true); // Open the floating chat
-    navigate('/live-assistance-session'); // Optionally, navigate to a session route
+    console.log('Accept button clicked'); // Add this line
+    setIsChatOpen(true);
+    navigate('/home');
   };
+  
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center px-4 py-8 bg-gradient-to-br from-lightblue-100 to-blue-200 text-gray-800 relative overflow-hidden">

@@ -1,35 +1,30 @@
 import React, { useContext, useEffect, useState, useRef } from 'react';
+import { FaPaperPlane, FaVolumeUp, FaMicrophone, FaCut } from 'react-icons/fa'; // Import the FaCut icon
 import { ChatContext } from '../../context/ChatContext';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios'; // Import Axios for making HTTP requests
-import useSpeechToText from '../../hooks/useSpeechToText'; // Import the custom hook
+import axios from 'axios';
+import useSpeechToText from '../../hooks/useSpeechToText';
 
 const FloatingChat = () => {
-  const { isChatOpen, toggleChat, endSession } = useContext(ChatContext);
-  const navigate = useNavigate();
+  const { isChatOpen, toggleChat } = useContext(ChatContext);
   const [messages, setMessages] = useState([]);
-  const [typedMessage, setTypedMessage] = useState(''); // New state for typed message
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [typedMessage, setTypedMessage] = useState('');
   const audioRef = useRef(null);
 
-  // Integrate the useSpeechToText hook
   const { isListning, transcript, startListning, stopListning } = useSpeechToText({
     lang: 'en-US',
     continuous: false,
     interimResults: false,
   });
 
-  // Update the chat input with the transcribed text when available
   useEffect(() => {
     if (transcript) {
-      setTypedMessage(transcript); // Set the transcribed text in the chat input
+      setTypedMessage(transcript);
     }
   }, [transcript]);
 
-  // Function to fetch messages
   const fetchMessages = async () => {
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-    
+
     if (!userInfo || !userInfo.id || !userInfo.email) {
       console.error('User information not found in localStorage');
       return;
@@ -43,45 +38,40 @@ const FloatingChat = () => {
     }
   };
 
-  // Fetch messages every 2 seconds
   useEffect(() => {
-    fetchMessages(); // Initial fetch
-
-    const intervalId = setInterval(fetchMessages, 2000); // Refresh messages every 2 seconds
-
+    fetchMessages();
+    const intervalId = setInterval(fetchMessages, 2000);
     return () => {
-      clearInterval(intervalId); // Cleanup interval on unmount
+      clearInterval(intervalId);
     };
-  }, []); // Empty dependency array to run on mount
+  }, []);
 
-  // Function to handle sending the message to the backend
   const handleSendMessage = async () => {
     if (typedMessage.trim() === '') return;
 
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-    
+
     if (!userInfo || !userInfo.id || !userInfo.email) {
       console.error('User information not found in localStorage');
       return;
     }
 
-    const newMessage = { 
-      userId: userInfo.id, 
-      userEmail: userInfo.email, 
-      from: 'user', 
-      content: typedMessage 
+    const newMessage = {
+      userId: userInfo.id,
+      userEmail: userInfo.email,
+      from: 'user',
+      content: typedMessage,
     };
 
     try {
       await axios.post('http://localhost:4000/api/messages', newMessage);
       setMessages((prevMessages) => [...prevMessages, newMessage]);
-      setTypedMessage(''); // Clear the input after sending
+      setTypedMessage('');
     } catch (error) {
       console.error('Failed to send message:', error);
     }
   };
 
-  // Function to read the last message aloud
   const readLastMessage = () => {
     if (messages.length === 0) {
       console.log('No messages to read');
@@ -89,32 +79,28 @@ const FloatingChat = () => {
     }
 
     const lastMessage = messages[messages.length - 1].content;
-
-    // Using the Web Speech API for text-to-speech
     const speech = new SpeechSynthesisUtterance(lastMessage);
-    speech.lang = 'en-US'; // Set the language
+    speech.lang = 'en-US';
     window.speechSynthesis.speak(speech);
+  };
+
+  const handleCutMessage = () => {
+    setTypedMessage(''); // Clears the message input when "Cut" button is pressed
   };
 
   return (
     <>
       {isChatOpen && (
         <div
-          className="fixed bottom-4 right-4 w-80 p-6 bg-black bg-opacity-70 shadow-2xl rounded-3xl z-50"
+          className="fixed bottom-4 right-4 w-80 p-6 bg-black bg-opacity-70 shadow-2xl rounded-3xl z-50 backdrop-filter backdrop-blur-md border border-gray-800"
           role="dialog"
           aria-labelledby="live-chat-title"
           aria-describedby="live-chat-description"
-          style={{ backdropFilter: 'blur(10px)', border: '1px solid rgba(255, 255, 255, 0.1)' }}
         >
-          <h2
-            id="live-chat-title"
-            className="text-xl font-semibold text-white mb-4"
-            aria-live="polite"
-          >
+          <h2 id="live-chat-title" className="text-xl font-semibold text-white mb-4" aria-live="polite">
             Live Voice Chat
           </h2>
 
-          {/* Message list */}
           <div className="mb-6 h-40 overflow-y-auto flex flex-col gap-4 p-4 bg-gray-900 bg-opacity-50 rounded-xl" role="log">
             {messages.map((message, index) => (
               <div
@@ -138,58 +124,52 @@ const FloatingChat = () => {
             ))}
           </div>
 
-          {/* Typing box for user input */}
           <div className="mb-4 flex items-center">
             <input
               type="text"
               value={typedMessage}
               onChange={(e) => setTypedMessage(e.target.value)}
               placeholder="Type a message..."
-              className="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none"
+              className="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
-            {/* Microphone button to trigger voice input */}
-            <button 
-              onClick={isListning ? stopListning : startListning} 
-              className={`ml-2 bg-${isListning ? 'red' : 'green'}-500 text-white rounded-full p-2 shadow-md`}
+            <button
+              onClick={isListning ? stopListning : startListning}
+              className={`ml-2 bg-${isListning ? 'red' : 'green'}-500 text-white rounded-full p-2 shadow-md transition-all hover:shadow-lg focus:outline-none`}
               aria-live="polite"
               aria-label="Start or stop voice input"
             >
-              🎤
+              <FaMicrophone />
             </button>
           </div>
 
-          {/* Send message button */}
-          <div className="flex items-center justify-between mb-4">
+          {/* Redesigned Buttons in the same row */}
+          <div className="flex justify-between items-center space-x-4 mt-4">
             <button
               onClick={handleSendMessage}
-              className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full px-4 py-2 shadow-md w-full text-base font-semibold transition-all focus:outline-none hover:from-blue-600 hover:to-blue-700"
+              className="bg-gradient-to-r from-green-400 to-green-500 text-white rounded-full p-4 shadow-lg text-lg font-semibold transition-transform transform hover:scale-105 hover:from-green-500 hover:to-green-600 focus:outline-none"
               aria-live="polite"
               aria-label="Send your message"
             >
-              Send Message
+              <FaPaperPlane size={20} />
+            </button>
+
+            <button
+              onClick={readLastMessage}
+              className="bg-gradient-to-r from-blue-400 to-blue-500 text-white rounded-full p-4 shadow-lg font-bold transition-transform transform hover:scale-105 hover:from-blue-500 hover:to-blue-600 focus:outline-none"
+              aria-label="Read last message aloud"
+            >
+              <FaVolumeUp size={20} />
+            </button>
+
+            {/* Cut button */}
+            <button
+              onClick={handleCutMessage}
+              className="bg-red-500 text-white rounded-full p-4 shadow-lg font-bold transition-transform transform hover:scale-105 focus:outline-none"
+              aria-label="Clear the message"
+            >
+              <FaCut size={20} />
             </button>
           </div>
-
-          {/* Button to read the last message */}
-          <button
-            onClick={readLastMessage}
-            className="mb-4 px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-full font-bold w-full shadow-md hover:from-purple-600 hover:to-purple-700 transition-all focus:outline-none"
-            aria-label="Read last message aloud"
-          >
-            Read Last Message
-          </button>
-
-          {/* End Session Button */}
-          <button
-            onClick={() => {
-              endSession();
-              navigate('/end-session');
-            }}
-            className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-full font-bold w-full shadow-md hover:from-red-600 hover:to-red-700 transition-all focus:outline-none"
-            aria-label="End live voice session"
-          >
-            End Session
-          </button>
 
           <button
             onClick={toggleChat}
