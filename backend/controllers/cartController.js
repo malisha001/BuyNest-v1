@@ -54,22 +54,31 @@ const updateCart = async (req,res) => {
 
 
 // get user cart data
-const getUserCart = async (req,res) => {
-
+const getUserCart = async (req, res) => {
     try {
-        
-        const { userId } = req.body
-        
-        const userData = await userModel.findById(userId)
-        let cartData = await userData.cartData;
+        const { userId } = req.body;
 
-        res.json({ success: true, cartData })
+        // Check if userId is provided
+        if (!userId) {
+            return res.status(400).json({ success: false, message: 'User ID is required.' });
+        }
 
+        const userData = await userModel.findById(userId);
+
+        // Check if userData is found
+        if (!userData) {
+            return res.status(404).json({ success: false, message: 'User not found.' });
+        }
+
+        // Ensure cartData is present
+        const cartData = userData.cartData || []; // Default to an empty array if cartData is not defined
+
+        res.json({ success: true, cartData });
     } catch (error) {
-        console.log(error)
-        res.json({ success: false, message: error.message })
+        console.log(error);
+        res.status(500).json({ success: false, message: 'Internal server error.' });
     }
+};
 
-}
 
 export { addToCart, updateCart, getUserCart }

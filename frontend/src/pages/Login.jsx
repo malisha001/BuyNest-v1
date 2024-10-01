@@ -19,6 +19,16 @@ const Login = () => {
         if (response.data.success) {
           setToken(response.data.token);
           localStorage.setItem('token', response.data.token);
+
+          // Save email and name as a single object in localStorage
+          if (response.data.email && response.data.name) {
+            const userInfo = { email: response.data.email, name: response.data.name };
+            console.log(userInfo);
+            localStorage.setItem('userInfo', JSON.stringify(userInfo));
+          } else {
+            toast.error('Failed to retrieve user information.');
+          }
+
         } else {
           toast.error(response.data.message);
         }
@@ -27,6 +37,10 @@ const Login = () => {
         if (response.data.success) {
           setToken(response.data.token);
           localStorage.setItem('token', response.data.token);
+          const userInfo = { email: response.data.email, name: response.data.name,token:response.data.token, id: response.data.id };
+          console.log(userInfo);
+          localStorage.setItem('userInfo', JSON.stringify(userInfo));
+          
         } else {
           toast.error(response.data.message);
         }
