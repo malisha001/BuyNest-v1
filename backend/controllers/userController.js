@@ -99,5 +99,49 @@ const adminLogin = async (req, res) => {
     }
 }
 
+const getUserProfile = async (req, res) => {
+    try {
+        const user = await userModel.findById(req.user.id);
+        if (!user) {
+            return res.json({ success: false, message: "User not found" });
+        }
+        res.json({
+            success: true,
+            name: user.name,
+            email: user.email, // only retrieve these fields for the profile
+            cartData: user.cartData // or any other existing field you want to show in the profile
+        });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+};
 
-export { loginUser, registerUser, adminLogin }
+const updateUserProfile = async (req, res) => {
+    try {
+        const { name } = req.body;
+
+        // Update only name field in this case
+        const updatedUser = await userModel.findByIdAndUpdate(
+            req.user.id, // assuming req.user is set by JWT middleware
+            { name }, 
+            { new: true } // returns the updated document
+        );
+
+        if (!updatedUser) {
+            return res.json({ success: false, message: "User not found" });
+        }
+
+        res.json({
+            success: true,
+            name: updatedUser.name,
+            email: updatedUser.email, // or any other field
+        });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+};
+
+
+export { loginUser, registerUser, adminLogin, getUserProfile, updateUserProfile };

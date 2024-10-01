@@ -14,36 +14,27 @@ const Login = () => {
   const onSubmitHandler = async (event) => {
     event.preventDefault();
     try {
+      const endpoint = currentState === 'Sign Up' ? '/api/user/register' : '/api/user/login';
+      const userData = { email, password };
       if (currentState === 'Sign Up') {
-        const response = await axios.post(backendUrl + '/api/user/register', { name, email, password });
-        if (response.data.success) {
-          setToken(response.data.token);
-          localStorage.setItem('token', response.data.token);
+        userData.name = name;
+      }
+      const response = await axios.post(backendUrl + endpoint, userData);
 
-          // Save email and name as a single object in localStorage
-          if (response.data.email && response.data.name) {
-            const userInfo = { email: response.data.email, name: response.data.name };
-            console.log(userInfo);
-            localStorage.setItem('userInfo', JSON.stringify(userInfo));
-          } else {
-            toast.error('Failed to retrieve user information.');
-          }
+      if (response.data.success) {
+        setToken(response.data.token);
+        localStorage.setItem('token', response.data.token);
+        const userInfo = { email: response.data.email, name: response.data.name, token: response.data.token, id: response.data.id };
+        localStorage.setItem('userInfo', JSON.stringify(userInfo));
 
+        // Navigate to '/assis-dash' if the logged-in user's email is 'helper@gmail.com'
+        if (email === 'helper@gmail.com') {
+          navigate('/assis-dash');
         } else {
-          toast.error(response.data.message);
+          navigate('/');
         }
       } else {
-        const response = await axios.post(backendUrl + '/api/user/login', { email, password });
-        if (response.data.success) {
-          setToken(response.data.token);
-          localStorage.setItem('token', response.data.token);
-          const userInfo = { email: response.data.email, name: response.data.name,token:response.data.token, id: response.data.id };
-          console.log(userInfo);
-          localStorage.setItem('userInfo', JSON.stringify(userInfo));
-          
-        } else {
-          toast.error(response.data.message);
-        }
+        toast.error(response.data.message);
       }
     } catch (error) {
       console.error(error);
@@ -55,14 +46,13 @@ const Login = () => {
     if (token) {
       navigate('/');
     }
-  }, [token]);
+  }, [token, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <form onSubmit={onSubmitHandler} className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
         <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">{currentState}</h1>
-        
-        {/* Form Inputs */}
+
         {currentState === 'Sign Up' && (
           <input
             type="text"
@@ -90,7 +80,6 @@ const Login = () => {
           required
         />
 
-        {/* Forgot Password / Switch Between Login and Sign Up */}
         <div className="flex justify-between mt-4 text-sm text-gray-500">
           <span className="cursor-pointer hover:text-indigo-600">Forgot your password?</span>
           {currentState === 'Login' ? (
@@ -104,12 +93,10 @@ const Login = () => {
           )}
         </div>
 
-        {/* Submit Button */}
         <button type="submit" className="mt-6 w-full py-3 text-white bg-[#124271] rounded-lg shadow-md hover:bg-[#0e3b5c] transition-all">
           {currentState === 'Login' ? 'Sign In' : 'Sign Up'}
         </button>
 
-        {/* Styling for animation */}
         <style>{`
           .input-field {
             width: 100%;

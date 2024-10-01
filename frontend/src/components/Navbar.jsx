@@ -50,6 +50,9 @@ const Navbar = () => {
     setCartItems({});
   };
 
+  // Check if the user is logged in by checking if there is a token in localStorage
+  const isLoggedIn = !!localStorage.getItem('token');
+
   // Close dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -134,7 +137,7 @@ const Navbar = () => {
             to="/accessibility"
             className="relative flex flex-col items-center gap-1 group"
             activeClassName="active-link"
-            aria-label="Contact"
+            aria-label="Accessibility"
             style={({ isActive }) => ({
               borderBottom: isActive ? '3px solid #333' : 'none',
               paddingBottom: isActive ? '5px' : 'none',
@@ -157,8 +160,8 @@ const Navbar = () => {
             aria-label="Search"
           />
 
-        {/* Profile with Dropdown */}
-        <div className="relative">
+          {/* Profile with Dropdown */}
+          <div className="relative">
             <img
               onClick={() => setIsDropdownOpen(!isDropdownOpen)} // Toggle dropdown visibility
               className={`w-6 cursor-pointer ${isHighContrast ? 'filter invert' : ''}`}
@@ -189,16 +192,26 @@ const Navbar = () => {
             </p>
           </Link>
 
-          {/* High Contrast Mode Toggle */}
-          <button
-            onClick={toggleContrast}
-            className={`p-2 bg-gray-200 rounded-full text-sm ${
-              isHighContrast ? 'text-white bg-black' : 'text-gray-800'
-            } hover:bg-gray-300`}
-            aria-label="Toggle High Contrast Mode"
-          >
-            {isHighContrast ? 'Normal Mode' : 'High Contrast'}
-          </button>
+          {/* Show Login Button if not logged in, otherwise High Contrast Mode Toggle */}
+          {isLoggedIn ? (
+            <button
+              onClick={toggleContrast}
+              className={`p-2 bg-gray-200 rounded-full text-sm ${
+                isHighContrast ? 'text-white bg-black' : 'text-gray-800'
+              } hover:bg-gray-300`}
+              aria-label="Toggle High Contrast Mode"
+            >
+              {isHighContrast ? 'Normal Mode' : 'High Contrast'}
+            </button>
+          ) : (
+            <button
+              onClick={() => navigate('/login')}
+              className="p-2 bg-gray-200 rounded-full text-sm text-gray-800 hover:bg-gray-300"
+              aria-label="Login"
+            >
+              Login
+            </button>
+          )}
 
           {/* Voice Recognition Button */}
           <button
