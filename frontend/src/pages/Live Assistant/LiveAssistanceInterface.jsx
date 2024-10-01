@@ -44,7 +44,7 @@ const LiveAssistanceInterface = () => {
       }
     };
 
-    // Fetch all user messages
+    // Function to fetch all user messages
     const fetchUserMessages = async () => {
       try {
         const response = await axios.get(`http://localhost:4000/api/messages/${userId}`);
@@ -69,7 +69,11 @@ const LiveAssistanceInterface = () => {
       setCurrentCart(updatedCart);
     });
 
+    // Set up an interval to refresh messages every 2 seconds
+    const intervalId = setInterval(fetchUserMessages, 2000);
+
     return () => {
+      clearInterval(intervalId); // Clear the interval on component unmount
       socket.off('new_message');
       socket.off('cart_updated');
     };
