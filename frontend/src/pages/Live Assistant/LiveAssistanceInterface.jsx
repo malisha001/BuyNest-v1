@@ -3,6 +3,7 @@ import { FaMicrophone, FaPlay, FaCartArrowDown, FaShoppingCart, FaFlag, FaTimes 
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios'; // For fetching product details and chat messages
 import { io } from 'socket.io-client'; // Import Socket.IO client
+import { FaPaperPlane } from 'react-icons/fa';
 
 const LiveAssistanceInterface = () => {
   const location = useLocation();
@@ -100,7 +101,7 @@ const LiveAssistanceInterface = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           
           {/* Voice Chat and Messages Section */}
-          <section className={`relative rounded-2xl p-6 shadow-2xl hover:shadow-xl transition-shadow duration-300 ${lightMode ? 'bg-white' : 'bg-white/10'}`}>
+          <section className={`relative rounded-2xl p-6 shadow-2xl ${lightMode ? 'bg-white' : 'bg-gray-800'}`}>
             <div className="flex justify-between items-center mb-4">
               <h2 className={`text-3xl font-bold ${lightMode ? 'text-gray-800' : 'text-white'}`}>Chat Messages</h2>
               <span className="absolute top-2 right-2 animate-pulse bg-red-500 text-white px-4 py-2 rounded-full font-semibold text-sm shadow-md">
@@ -109,34 +110,55 @@ const LiveAssistanceInterface = () => {
             </div>
 
             {/* Chat Messages */}
-            <div className="flex flex-col space-y-4 h-64 overflow-y-auto">
-              {chatMessages.map((msg) => (
-                <div
-                  key={msg._id}
-                  className={`p-4 rounded-xl shadow-md ${msg.from === 'assistant' ? 'bg-blue-500' : 'bg-green-500'} ${lightMode ? 'text-gray-800' : 'text-white'}`}
-                >
-                  <div className="text-sm">{msg.content}</div>
-                  <div className="text-xs mt-2">{new Date(msg.createdAt).toLocaleString()}</div>
-                </div>
-              ))}
-            </div>
+            <div
+  className={`flex flex-col space-y-4 overflow-y-auto p-4 rounded-xl ${lightMode ? 'bg-gray-200' : 'bg-gray-700'}`}
+  style={{
+    maxHeight: '20rem',  // This limits the height to fit approximately 5 chat messages
+    scrollbarWidth: 'thin', // For Firefox
+    scrollbarColor: `${lightMode ? '#A0AEC0 #E2E8F0' : '#4A5568 #2D3748'}`, // Custom scrollbar colors
+  }}
+>
+  {chatMessages.slice(-10).map((msg) => (  // Display the last 5 messages only
+    <div
+      key={msg._id}
+      className={`flex ${msg.from === 'assistant' ? 'justify-start' : 'justify-end'}`}
+    >
+      <div
+        className={`relative p-3 rounded-lg shadow-md 
+          ${msg.from === 'assistant' ? 'bg-gray-200 text-gray-900' : 'bg-green-500 text-white'} 
+          ${lightMode ? 'shadow-lg' : ''}`}
+        style={{
+          border: '1px solid rgba(0, 0, 0, 0.1)', // Soft inner border
+          boxShadow: 'inset 0 0 5px rgba(0, 0, 0, 0.1)', // Inner shadow for depth
+        }}
+      >
+        {msg.content}
+        <div className="text-xs mt-1 text-gray-500">
+          {new Date(msg.createdAt).toLocaleString()}
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
 
-            {/* Message Input */}
-            <div className="flex mt-4">
-              <input
-                type="text"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Type a message..."
-                className="w-full p-3 rounded-l-lg border-gray-300"
-              />
-              <button
-                onClick={handleSendMessage}
-                className="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-r-lg"
-              >
-                Send
-              </button>
-            </div>
+
+           {/* Message Input */}
+           <div className="flex mt-4">
+  <input
+    type="text"
+    value={newMessage}
+    onChange={(e) => setNewMessage(e.target.value)}
+    placeholder="Type a message..."
+    className="w-full p-3 rounded-full border-gray-300 text-black"  // Fully rounded input
+  />
+  <button
+    onClick={handleSendMessage}
+    className="bg-blue-500 hover:bg-blue-600 text-white w-12 h-12 p-3 rounded-full ml-2 flex justify-center items-center"  // Increased width and height, fully rounded
+  >
+    <FaPaperPlane className="text-white text-xl" />  {/* Larger Send icon */}
+  </button>
+</div>
+
           </section>
 
           {/* Cart View Section */}
