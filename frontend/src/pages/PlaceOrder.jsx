@@ -32,6 +32,7 @@ const PlaceOrder = () => {
     country: '',
     zipcode: '',
     phone: '',
+    email: '', // Add email error state
   });
 
   const onChangeHandler = (event) => {
@@ -44,6 +45,16 @@ const PlaceOrder = () => {
       return; // Stop processing if the length exceeds 10
     } else {
       setError((prev) => ({ ...prev, phone: '' })); // Clear error when valid
+    }
+
+    // Email validation
+    if (name === 'email') {
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Simple email regex pattern
+      if (!emailPattern.test(value)) {
+        setError((prev) => ({ ...prev, email: 'Invalid email format.' }));
+      } else {
+        setError((prev) => ({ ...prev, email: '' })); // Clear error if valid
+      }
     }
 
     setFormData((data) => ({ ...data, [name]: value }));
@@ -113,7 +124,7 @@ const PlaceOrder = () => {
   const onSubmitHandler = async (event) => {
     event.preventDefault();
     // Validate error state before proceeding
-    if (error.firstName || error.lastName || error.city || error.state || error.country || error.zipcode || error.phone) {
+    if (error.firstName || error.lastName || error.city || error.state || error.country || error.zipcode || error.phone || error.email) {
       toast.error('Please fix the errors before submitting.');
       return;
     }
@@ -220,28 +231,28 @@ const PlaceOrder = () => {
     const tableRows = [];
 
     Object.keys(cartItems).forEach((productId) => {
-        Object.keys(cartItems[productId]).forEach((size) => {
-            const product = products.find((p) => p._id === productId);
-            const rowData = [
-                product ? product.name : '',
-                size,
-                cartItems[productId][size],
-                (product ? product.price.toFixed(2) : '0.00'),
-                (product ? (product.price * cartItems[productId][size]).toFixed(2) : '0.00'),
-            ];
-            tableRows.push(rowData);
-        });
+      Object.keys(cartItems[productId]).forEach((size) => {
+        const product = products.find((p) => p._id === productId);
+        const rowData = [
+          product ? product.name : '',
+          size,
+          cartItems[productId][size],
+          (product ? product.price.toFixed(2) : '0.00'),
+          (product ? (product.price * cartItems[productId][size]).toFixed(2) : '0.00'),
+        ];
+        tableRows.push(rowData);
+      });
     });
 
     // Add table with striped rows and elegant formatting
     doc.autoTable({
-        startY: 140,
-        head: [tableColumn],
-        body: tableRows,
-        theme: 'striped',
-        headStyles: { fillColor: [22, 160, 133], textColor: [255, 255, 255] },  // Custom colors
-        styles: { fontSize: 11, cellPadding: 3 },
-        columnStyles: { 0: { halign: 'left' }, 4: { halign: 'right' } },
+      startY: 140,
+      head: [tableColumn],
+      body: tableRows,
+      theme: 'striped',
+      headStyles: { fillColor: [22, 160, 133], textColor: [255, 255, 255] },  // Custom colors
+      styles: { fontSize: 11, cellPadding: 3 },
+      columnStyles: { 0: { halign: 'left' }, 4: { halign: 'right' } },
     });
 
     // Calculate positions for summary
@@ -273,8 +284,7 @@ const PlaceOrder = () => {
 
     // Save the PDF
     doc.save(`Invoice_${new Date().toLocaleDateString()}.pdf`);
-};
-
+  };
 
   return (
     <form onSubmit={onSubmitHandler} className='flex flex-col sm:flex-row justify-between gap-4 pt-5 sm:pt-14 min-h-[80vh] border-t'>
@@ -308,6 +318,7 @@ const PlaceOrder = () => {
           {error.lastName && <p className='text-red-500 text-sm'>{error.lastName}</p>}
         </div>
         <input required onChange={onChangeHandler} name='email' value={formData.email} className='border border-gray-300 rounded py-1.5 px-3.5 w-full' type='email' placeholder='Email address' />
+        {error.email && <p className='text-red-500 text-sm'>{error.email}</p>} {/* Display email error */}
         <input required onChange={onChangeHandler} name='street' value={formData.street} className='border border-gray-300 rounded py-1.5 px-3.5 w-full' type='text' placeholder='Street' />
         <div className='flex gap-3'>
           <input
