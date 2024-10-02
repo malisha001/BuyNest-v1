@@ -3,21 +3,18 @@ import refundModel from '../models/refundModel.js'
 const placeRefund = async (req, res) => {
     try{
         
-        const { orderID, rfun_userId, reasons, additionalInfo, date } = req.body;
+        const { orderID, userID, reasons, additionalInfo, date } = req.body
         {console.log(req.body)}
-
-        if (!orderID || !reasons || !date) {
-            return res.status(400).json({ success: false, message: 'Missing required fields' });
-        }
 
         const refundData = {
             orderID,
-            userId: rfun_userId,
+            userID,
             reasons,
             additionalInfo,
             date,
             reqestDate: Date.now()
         }
+        console.log(refundData);
 
         const refund = new refundModel(refundData);
         await refund.save();
@@ -36,7 +33,7 @@ const placeRefund = async (req, res) => {
 const getAllRefunds = async (req, res) => {
     try {
         const refunds = await refundModel.find({});
-        res.json({ success: true, data: refunds });
+        res.json({ success: true, refunds });
     } catch (error) {
         console.log(error);
         res.json({ success: false, message: error.message });

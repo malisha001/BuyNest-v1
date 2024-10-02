@@ -14,7 +14,7 @@ export default function Refund() {
     const navigate = useNavigate();
 
     const [rfun_reason, setOtherReason] = useState("");
-    const [rfun_additionalInfo, setAdditionalInfo] = useState("");
+    const [additionalInfo, setAdditionalInfo] = useState("");
     const [reasons, setReasons] = useState([]);
 
     const onSubmitHandler = async (e) => {
@@ -22,13 +22,14 @@ export default function Refund() {
       try {
           const formData = {
               orderID: orderDetails._id,  // directly from orderDetails
-              rfun_userId: orderDetails.userID,  // directly from orderDetails
-              reasons: reasons.join(', '),
-              rfun_additionalInfo,
-              rfun_date: orderDetails.date  // directly from orderDetails
+              userID: orderDetails.userId,  // directly from orderDetails
+              reasons : reasons.join(', ') && rfun_reason ? reasons.join(', ') + ', ' + rfun_reason : reasons.join(', ') || rfun_reason || 'No reason specified',
+              additionalInfo:additionalInfo||'',
+              date: orderDetails.date  // directly from orderDetails
           };
+          console.log(formData);
           
-          const response = await axios.post(`${backendUrl}/api/order/submit-refund`, formData, { headers: { Authorization: `Bearer ${token}` } });
+          const response = await axios.post(backendUrl + '/api/order/submit-refund', formData, { headers: { token } });
           if (response.data.success) {
               toast.success(response.data.message);
               navigate('/orders');
@@ -41,6 +42,7 @@ export default function Refund() {
       }
   };
 
+  // Checkbox handler
   const handleCheckboxChange = (e) => {
     const { value, checked } = e.target;
     if (checked) {
@@ -107,7 +109,7 @@ export default function Refund() {
                     <div><input type='checkbox' id='misssmatch' name='missmatch' value='missmatch' onChange={handleCheckboxChange} className='mr-5 hover:border-red accent-red-500'/>Product does not match description</div>
                     <div><input type='checkbox' id='other' name='other' value='other' className='mr-5 hover:border-red accent-red-500' onChange={actInput} />Other (Please specify):</div>
                     <input onChange={(e) => setOtherReason(e.target.value)} value={rfun_reason} className='w-full px-4 my-2 py-3 border border-gray-300 rounded-xl focus:border-gray-500 focus:ring-2 focus:ring-gray-200 transition' type="text" placeholder='Other' disabled={isDisabled} />
-                    <input onChange={(e) => setAdditionalInfo(e.target.value)} value={rfun_additionalInfo} className='w-full px-4 my-2 py-3 border border-gray-300 rounded-xl focus:border-gray-500 focus:ring-2 focus:ring-gray-200 transition' type="text" placeholder='Additional Information' />
+                    <input onChange={(e) => setAdditionalInfo(e.target.value)} value={additionalInfo} className='w-full px-4 my-2 py-3 border border-gray-300 rounded-xl focus:border-gray-500 focus:ring-2 focus:ring-gray-200 transition' type="text" placeholder='Additional Information' />
                     <button className='w-full bg-[#124271] text-white rounded-lg py-3 mt-4 hover:bg-red-600 transition'>Submit Refund Request</button>
                     </form>
                     </div>
