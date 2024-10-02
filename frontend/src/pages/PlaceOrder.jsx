@@ -24,10 +24,63 @@ const PlaceOrder = () => {
     phone: '',
   });
 
+  const [error, setError] = useState({
+    firstName: '',
+    lastName: '',
+    city: '',
+    state: '',
+    country: '',
+    zipcode: '',
+    phone: '',
+  });
+
   const onChangeHandler = (event) => {
     const name = event.target.name;
     const value = event.target.value;
+
+    // For phone validation
+    if (name === 'phone' && value.length > 10) {
+      setError((prev) => ({ ...prev, phone: 'Enter only 10 numbers.' }));
+      return; // Stop processing if the length exceeds 10
+    } else {
+      setError((prev) => ({ ...prev, phone: '' })); // Clear error when valid
+    }
+
     setFormData((data) => ({ ...data, [name]: value }));
+
+    // Clear error message when input is updated
+    if (['firstName', 'lastName', 'city', 'state', 'country', 'zipcode'].includes(name)) {
+      setError((prev) => ({ ...prev, [name]: '' }));
+    }
+
+    // Check if the zipcode is negative
+    if (name === 'zipcode' && value < 0) {
+      setError((prev) => ({ ...prev, [name]: 'Zipcode must be greater than or equal to 0.' }));
+    }
+  };
+
+  // Key press validation to allow only letters for specific fields
+  const handleKeyPress = (event, fieldName) => {
+    const regex = /^[A-Za-z]+$/; // Regex to allow only letters
+    if (!regex.test(event.key) && event.key !== 'Backspace') {
+      event.preventDefault(); // Prevent default action (typing)
+      setError((prev) => ({
+        ...prev,
+        [fieldName]: 'Please enter only letters.',
+      }));
+    }
+  };
+
+  // Key press validation to allow only numbers for phone field
+  const handlePhoneKeyPress = (event) => {
+    const regex = /^[0-9]+$/; // Regex to allow only numbers
+    if (!regex.test(event.key) && event.key !== 'Backspace') {
+      event.preventDefault(); // Prevent default action (typing)
+      setError((prev) => ({
+        ...prev,
+        phone: 'Please enter only numbers.',
+      }));
+    }
   };
 
   const initPay = (order) => {
@@ -59,6 +112,12 @@ const PlaceOrder = () => {
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
+    // Validate error state before proceeding
+    if (error.firstName || error.lastName || error.city || error.state || error.country || error.zipcode || error.phone) {
+      toast.error('Please fix the errors before submitting.');
+      return;
+    }
+
     try {
       let orderItems = [];
 
@@ -164,20 +223,89 @@ const PlaceOrder = () => {
           <Title text1={'DELIVERY'} text2={'INFORMATION'} />
         </div>
         <div className='flex gap-3'>
-          <input required onChange={onChangeHandler} name='firstName' value={formData.firstName} className='border border-gray-300 rounded py-1.5 px-3.5 w-full' type='text' placeholder='First name' />
-          <input required onChange={onChangeHandler} name='lastName' value={formData.lastName} className='border border-gray-300 rounded py-1.5 px-3.5 w-full' type='text' placeholder='Last name' />
+          <input
+            required
+            onChange={onChangeHandler}
+            onKeyPress={(event) => handleKeyPress(event, 'firstName')}
+            name='firstName'
+            value={formData.firstName}
+            className='border border-gray-300 rounded py-1.5 px-3.5 w-full'
+            type='text'
+            placeholder='First name'
+          />
+          {error.firstName && <p className='text-red-500 text-sm'>{error.firstName}</p>}
+          <input
+            required
+            onChange={onChangeHandler}
+            onKeyPress={(event) => handleKeyPress(event, 'lastName')}
+            name='lastName'
+            value={formData.lastName}
+            className='border border-gray-300 rounded py-1.5 px-3.5 w-full'
+            type='text'
+            placeholder='Last name'
+          />
+          {error.lastName && <p className='text-red-500 text-sm'>{error.lastName}</p>}
         </div>
         <input required onChange={onChangeHandler} name='email' value={formData.email} className='border border-gray-300 rounded py-1.5 px-3.5 w-full' type='email' placeholder='Email address' />
         <input required onChange={onChangeHandler} name='street' value={formData.street} className='border border-gray-300 rounded py-1.5 px-3.5 w-full' type='text' placeholder='Street' />
         <div className='flex gap-3'>
-          <input required onChange={onChangeHandler} name='city' value={formData.city} className='border border-gray-300 rounded py-1.5 px-3.5 w-full' type='text' placeholder='City' />
-          <input onChange={onChangeHandler} name='state' value={formData.state} className='border border-gray-300 rounded py-1.5 px-3.5 w-full' type='text' placeholder='State' />
+          <input
+            required
+            onChange={onChangeHandler}
+            onKeyPress={(event) => handleKeyPress(event, 'city')}
+            name='city'
+            value={formData.city}
+            className='border border-gray-300 rounded py-1.5 px-3.5 w-full'
+            type='text'
+            placeholder='City'
+          />
+          {error.city && <p className='text-red-500 text-sm'>{error.city}</p>}
+          <input
+            onChange={onChangeHandler}
+            onKeyPress={(event) => handleKeyPress(event, 'state')}
+            name='state'
+            value={formData.state}
+            className='border border-gray-300 rounded py-1.5 px-3.5 w-full'
+            type='text'
+            placeholder='State'
+          />
+          {error.state && <p className='text-red-500 text-sm'>{error.state}</p>}
         </div>
         <div className='flex gap-3'>
-          <input required onChange={onChangeHandler} name='zipcode' value={formData.zipcode} className='border border-gray-300 rounded py-1.5 px-3.5 w-full' type='number' placeholder='Zipcode' />
-          <input required onChange={onChangeHandler} name='country' value={formData.country} className='border border-gray-300 rounded py-1.5 px-3.5 w-full' type='text' placeholder='Country' />
+          <input 
+            required 
+            onChange={onChangeHandler} 
+            name='zipcode' 
+            value={formData.zipcode} 
+            className='border border-gray-300 rounded py-1.5 px-3.5 w-full' 
+            type='number' 
+            min='0' 
+            placeholder='Zipcode'
+          />
+          {error.zipcode && <p className='text-red-500 text-sm'>{error.zipcode}</p>}
+          <input
+            required
+            onChange={onChangeHandler}
+            onKeyPress={handlePhoneKeyPress}
+            name='phone'
+            value={formData.phone}
+            className='border border-gray-300 rounded py-1.5 px-3.5 w-full'
+            type='number'
+            placeholder='Phone'
+          />
+          {error.phone && <p className='text-red-500 text-sm'>{error.phone}</p>}
         </div>
-        <input required onChange={onChangeHandler} name='phone' value={formData.phone} className='border border-gray-300 rounded py-1.5 px-3.5 w-full' type='number' placeholder='Phone' />
+        <input
+          required
+          onChange={onChangeHandler}
+          onKeyPress={(event) => handleKeyPress(event, 'country')}
+          name='country'
+          value={formData.country}
+          className='border border-gray-300 rounded py-1.5 px-3.5 w-full'
+          type='text'
+          placeholder='Country'
+        />
+        {error.country && <p className='text-red-500 text-sm'>{error.country}</p>}
       </div>
 
       {/* ------------- Right Side ------------------ */}
