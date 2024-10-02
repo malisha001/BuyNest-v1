@@ -121,36 +121,70 @@ const List = ({ token }) => {
 
   const generateReport = () => {
     const doc = new jsPDF();
-    
+
     // Add "Forever" as a centered logo or title
-    doc.setFontSize(24);
-    doc.text("Forever", 105, 20, { align: "center" });
-    
-    // Add table with product data
-    doc.setFontSize(14);
-    doc.text("Product List Report", 14, 30);
-    
-    const tableColumn = ["Name", "Category", "Price", "Sizes"];
+    doc.setFontSize(28);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Forever', 105, 20, { align: 'center' });
+
+    // Add a separator line under the logo
+    doc.setLineWidth(0.5);
+    doc.line(15, 25, 195, 25);
+
+    // Report title and date
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Product List Report', 105, 35, { align: 'center' });
+
+    doc.setFontSize(12);
+    const date = new Date().toLocaleDateString();
+    doc.text(`Date: ${date}`, 15, 45);
+    doc.text(`Total Products: ${list.length}`, 15, 52);
+
+    // Adding extra line break for spacing
+    doc.line(15, 55, 195, 55);
+
+    // Define the table headers
+    const tableColumn = ['Name', 'Category', 'Price (LKR)', 'Available Sizes'];
+
+    // Initialize the rows for the table
     const tableRows = [];
 
     list.forEach((item) => {
-      const productData = [
-        item.name,
-        item.category,
-        `${currency}${item.price}`,
-        item.sizes ? item.sizes.join(", ") : "N/A"
-      ];
-      tableRows.push(productData);
+        const productData = [
+            item.name,
+            item.category,
+            `${currency}${item.price.toFixed(2)}`, // Price formatted to 2 decimal places
+            item.sizes ? item.sizes.join(", ") : "N/A",
+        ];
+        tableRows.push(productData);
     });
 
+    // Generate the table
     doc.autoTable({
-      startY: 40,
-      head: [tableColumn],
-      body: tableRows,
+        startY: 60,  // Start below the title and info
+        head: [tableColumn],
+        body: tableRows,
+        theme: 'grid',  // A clean grid theme
+        headStyles: { fillColor: [22, 160, 133], textColor: 255 }, // Elegant header colors
+        styles: { fontSize: 10, halign: 'center' },
+        columnStyles: {
+            0: { halign: 'left' },  // Align name to the left
+            2: { halign: 'right' }  // Align prices to the right
+        }
     });
 
-    doc.save("Product_Report.pdf");
-  };
+    // Add a footer
+    const finalY = doc.autoTable.previous.finalY + 10;  // Position footer after table
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text("This report was generated automatically by Forever's system.", 105, finalY, { align: 'center' });
+    doc.text("For more details, visit our website or contact us at info@forever.com", 105, finalY + 6, { align: 'center' });
+
+    // Save the PDF
+    doc.save(`Product_List_Report_${date}.pdf`);
+};
+
 
   useEffect(() => {
     fetchList();

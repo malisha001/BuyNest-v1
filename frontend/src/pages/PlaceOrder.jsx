@@ -171,49 +171,110 @@ const PlaceOrder = () => {
   const downloadBill = () => {
     const doc = new jsPDF();
 
-    // Add the title of the document
-    doc.setFontSize(20);
-    doc.text('Order Bill', 105, 10, { align: 'center' });
+    // Add Company Logo (Text "Forever" as logo)
+    doc.setFontSize(28);
+    doc.setTextColor(40, 40, 40);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Forever', 105, 25, { align: 'center' });
 
-    // Add customer details
+    // Add line below the logo
+    doc.setLineWidth(0.5);
+    doc.line(15, 30, 195, 30);
+
+    // Company Information
     doc.setFontSize(12);
-    doc.text(`Customer Name: ${formData.firstName} ${formData.lastName}`, 14, 30);
-    doc.text(`Email: ${formData.email}`, 14, 40);
-    doc.text(`Address: ${formData.street}, ${formData.city}, ${formData.state}, ${formData.zipcode}, ${formData.country}`, 14, 50);
-    doc.text(`Phone: ${formData.phone}`, 14, 60);
+    doc.setTextColor(60, 60, 60);
+    doc.setFont('helvetica', 'normal');
+    doc.text("123 Business Street, Colombo", 105, 38, { align: "center" });
+    doc.text("Phone: +94 123456789 | Email: info@forever.com", 105, 44, { align: "center" });
 
-    // Create table for the cart items
-    const tableColumn = ['Product', 'Size', 'Quantity', 'Price'];
+    // Add another separating line
+    doc.line(15, 48, 195, 48);
+
+    // Invoice Title and Date
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Invoice`, 14, 60);
+    doc.setFontSize(12);
+    doc.text(`Invoice No: 12345`, 14, 70);  // You can dynamically generate this invoice number
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 76);
+
+    // Customer Information
+    doc.setFontSize(12);
+    doc.text(`Bill To:`, 14, 90);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`${formData.firstName} ${formData.lastName}`, 14, 96);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${formData.street}, ${formData.city}`, 14, 102);
+    doc.text(`${formData.state}, ${formData.zipcode}`, 14, 108);
+    doc.text(`${formData.country}`, 14, 114);
+    doc.text(`Phone: ${formData.phone}`, 14, 120);
+    doc.text(`Email: ${formData.email}`, 14, 126);
+
+    // Add space before the table
+    doc.setLineWidth(0.5);
+    doc.line(15, 130, 195, 130);
+
+    // Order Details Table
+    const tableColumn = ['Item', 'Size', 'Qty', 'Unit Price (LKR)', 'Total (LKR)'];
     const tableRows = [];
 
     Object.keys(cartItems).forEach((productId) => {
-      Object.keys(cartItems[productId]).forEach((size) => {
-        const product = products.find((p) => p._id === productId);
-        const rowData = [
-          product ? product.name : '',
-          size,
-          cartItems[productId][size],
-          `LKR ${(product ? product.price : 0) * cartItems[productId][size]}`, // Using LKR as currency
-        ];
-        tableRows.push(rowData);
-      });
+        Object.keys(cartItems[productId]).forEach((size) => {
+            const product = products.find((p) => p._id === productId);
+            const rowData = [
+                product ? product.name : '',
+                size,
+                cartItems[productId][size],
+                (product ? product.price.toFixed(2) : '0.00'),
+                (product ? (product.price * cartItems[productId][size]).toFixed(2) : '0.00'),
+            ];
+            tableRows.push(rowData);
+        });
     });
 
-    // Add table to PDF
+    // Add table with striped rows and elegant formatting
     doc.autoTable({
-      startY: 70,
-      head: [tableColumn],
-      body: tableRows,
+        startY: 140,
+        head: [tableColumn],
+        body: tableRows,
+        theme: 'striped',
+        headStyles: { fillColor: [22, 160, 133], textColor: [255, 255, 255] },  // Custom colors
+        styles: { fontSize: 11, cellPadding: 3 },
+        columnStyles: { 0: { halign: 'left' }, 4: { halign: 'right' } },
     });
 
-    // Add total amount at the end of the table
-    const totalAmount = getCartAmount() + delivery_fee;
-    doc.text(`Delivery Fee: LKR ${delivery_fee.toFixed(2)}`, 14, doc.lastAutoTable.finalY + 10);
-    doc.text(`Total Amount: LKR ${totalAmount.toFixed(2)}`, 14, doc.lastAutoTable.finalY + 20);
+    // Calculate positions for summary
+    const finalY = doc.autoTable.previous.finalY + 10;
+    const subtotal = getCartAmount();
+    const deliveryFee = delivery_fee;
+    const total = subtotal + deliveryFee;
+
+    // Add Summary Information
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Summary`, 14, finalY);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Subtotal:`, 150, finalY + 10, { align: 'right' });
+    doc.text(`LKR ${subtotal.toFixed(2)}`, 190, finalY + 10, { align: 'right' });
+    doc.text(`Delivery Fee:`, 150, finalY + 20, { align: 'right' });
+    doc.text(`LKR ${deliveryFee.toFixed(2)}`, 190, finalY + 20, { align: 'right' });
+    doc.text(`Total:`, 150, finalY + 30, { align: 'right' });
+    doc.setFont('helvetica', 'bold');
+    doc.text(`LKR ${total.toFixed(2)}`, 190, finalY + 30, { align: 'right' });
+
+    // Footer section
+    doc.setLineWidth(0.5);
+    doc.line(15, finalY + 40, 195, finalY + 40); // Line before footer
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'italic');
+    doc.text('Thank you for shopping with us!', 105, finalY + 50, { align: 'center' });
+    doc.text('For inquiries, contact info@forever.com', 105, finalY + 56, { align: 'center' });
 
     // Save the PDF
-    doc.save('Order_Bill.pdf');
-  };
+    doc.save(`Invoice_${new Date().toLocaleDateString()}.pdf`);
+};
+
 
   return (
     <form onSubmit={onSubmitHandler} className='flex flex-col sm:flex-row justify-between gap-4 pt-5 sm:pt-14 min-h-[80vh] border-t'>
