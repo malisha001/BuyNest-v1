@@ -2,6 +2,8 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { backendUrl, currency } from '../App';
 import { toast } from 'react-toastify';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 const List = ({ token }) => {
   const [list, setList] = useState([]);
@@ -29,7 +31,6 @@ const List = ({ token }) => {
   const removeProduct = async (id) => {
     try {
       const response = await axios.post(backendUrl + '/api/product/remove', { id }, { headers: { token } });
-
       if (response.data.success) {
         toast.success(response.data.message);
         await fetchList();
@@ -62,26 +63,54 @@ const List = ({ token }) => {
     );
   };
 
+  // Frontend validation function
+  const validateInputs = () => {
+    if (updatedName.trim() === '') {
+      toast.error('Product name cannot be empty.');
+      return false;
+    }
+
+    if (!updatedPrice || isNaN(updatedPrice) || updatedPrice <= 0) {
+      toast.error('Please enter a valid price greater than zero.');
+      return false;
+    }
+
+    if (!['Men', 'Women', 'Kids'].includes(updatedCategory)) {
+      toast.error('Please select a valid category.');
+      return false;
+    }
+
+    if (updatedSizes.length === 0) {
+      toast.error('Please select at least one size.');
+      return false;
+    }
+
+    return true;
+  };
+
   const handleUpdate = async () => {
     if (!selectedProduct) return;
-  
+
+    // Check inputs before submitting
+    if (!validateInputs()) return;
+
     try {
       const updatedData = {
-        id: selectedProduct._id,  // Include the product ID here
+        id: selectedProduct._id,
         name: updatedName,
         price: updatedPrice,
         category: updatedCategory,
         sizes: updatedSizes,
       };
-  
-      const response = await axios.post(backendUrl + '/api/product/update', updatedData, { 
-        headers: { token },  // Include the token in the headers if required
+
+      const response = await axios.post(backendUrl + '/api/product/update', updatedData, {
+        headers: { token },
       });
-  
+
       if (response.data.success) {
         toast.success("Product updated successfully");
-        await fetchList();  // Refresh the list after update
-        closeModal();  // Close the modal
+        await fetchList();
+        closeModal();
       } else {
         toast.error(response.data.message);
       }
@@ -89,7 +118,39 @@ const List = ({ token }) => {
       toast.error(error.message);
     }
   };
-  
+
+  const generateReport = () => {
+    const doc = new jsPDF();
+    
+    // Add "Forever" as a centered logo or title
+    doc.setFontSize(24);
+    doc.text("Forever", 105, 20, { align: "center" });
+    
+    // Add table with product data
+    doc.setFontSize(14);
+    doc.text("Product List Report", 14, 30);
+    
+    const tableColumn = ["Name", "Category", "Price", "Sizes"];
+    const tableRows = [];
+
+    list.forEach((item) => {
+      const productData = [
+        item.name,
+        item.category,
+        `${currency}${item.price}`,
+        item.sizes ? item.sizes.join(", ") : "N/A"
+      ];
+      tableRows.push(productData);
+    });
+
+    doc.autoTable({
+      startY: 40,
+      head: [tableColumn],
+      body: tableRows,
+    });
+
+    doc.save("Product_Report.pdf");
+  };
 
   useEffect(() => {
     fetchList();
@@ -97,7 +158,16 @@ const List = ({ token }) => {
 
   return (
     <>
-      <p className="text-2xl font-semibold text-gray-800 mb-4">All Products List</p>
+      <div className="flex justify-between items-center mb-4">
+        <p className="text-2xl font-semibold text-gray-800">All Products List</p>
+        <button
+          className="px-4 py-2 text-white rounded-lg"
+          style={{ backgroundColor: '#124271' }}
+          onClick={generateReport}
+        >
+          Generate Report
+        </button>
+      </div>
       <div className="flex flex-col gap-4">
         <div className="hidden md:grid grid-cols-[1fr_3fr_1fr_1fr_1fr_1fr] items-center py-3 px-4 border-b bg-gray-100 text-gray-700 text-base rounded-lg shadow-sm">
           <b>Image</b>
@@ -164,7 +234,16 @@ const List = ({ token }) => {
                   type="number"
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-200"
                   value={updatedPrice}
-                  onChange={(e) => setUpdatedPrice(e.target.value)}
+                  min="0.01" // Ensure price cannot be less than 0.01
+                  step="0.01" // Allows decimal input
+                  onChange={(e) => {
+                    const value = parseFloat(e.target.value);
+                    if (value >= 0) {
+                      setUpdatedPrice(e.target.value);
+                    } else {
+                      toast.error("Price cannot be less than zero.");
+                    }
+                  }}
                 />
               </div>
 
