@@ -32,19 +32,21 @@ const PlaceOrder = () => {
     country: '',
     zipcode: '',
     phone: '',
-    email: '', // Add email error state
+    email: '',
   });
 
   const onChangeHandler = (event) => {
     const name = event.target.name;
     const value = event.target.value;
 
-    // For phone validation
-    if (name === 'phone' && value.length > 10) {
-      setError((prev) => ({ ...prev, phone: 'Enter only 10 numbers.' }));
-      return; // Stop processing if the length exceeds 10
-    } else {
-      setError((prev) => ({ ...prev, phone: '' })); // Clear error when valid
+    // Phone number validation: check for exactly 10 digits
+    if (name === 'phone') {
+      const phonePattern = /^\d{10}$/; // Regex to allow exactly 10 digits
+      if (!phonePattern.test(value)) {
+        setError((prev) => ({ ...prev, phone: 'Phone number must be exactly 10 digits.' }));
+      } else {
+        setError((prev) => ({ ...prev, phone: '' })); // Clear error when valid
+      }
     }
 
     // Email validation
