@@ -6,7 +6,8 @@ const refundSchema = new mongoose.Schema({
     additionalInfo: { type: String,reqired:true},
     reasons: { type: String, required: true },
     date: {type: Number, required: true},
-    reqestDate: {type: Number,  required: true}
+    reqestDate: {type: Number,  required: true},
+    status: {type: String, required: true}
 })
 
 const refundModel = mongoose.models.refund || mongoose.model("refund",refundSchema);

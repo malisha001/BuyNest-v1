@@ -10,6 +10,7 @@ import Cart from './pages/Cart';
 import Login from './pages/Login';
 import PlaceOrder from './pages/PlaceOrder';
 import Orders from './pages/Orders';
+import UserRefunds from './pages/UserRefunds';
 import Refund from './pages/Refund';
 import LiveAssistanceStart from './pages/Live Assistant/LiveAssistanceStart';
 import WaitingForConnection from './pages/Live Assistant/WaitingForConnection';
@@ -83,6 +84,7 @@ const App = () => {
             <Route path="/profile" element={<Profile />} />
             <Route path="/place-order" element={<PlaceOrder />} />
             <Route path="/orders" element={<Orders />} />
+            <Route path="/user-refunds" element={<UserRefunds />} />
             <Route path="/refund/:orderId" element={<Refund />} />
             <Route path='/track-order/:orderId' element={<TrackOrder />} />
             <Route path="/live-start" element={<LiveAssistanceStart />} />

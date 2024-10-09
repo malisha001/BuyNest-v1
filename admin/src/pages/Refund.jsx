@@ -7,6 +7,27 @@ export default function OrderCancellation() {
 
   const [refunds, setRefunds] = useState([]);
 
+  const handelReject = () => {
+
+    const updateStatus = async (id) => {
+      try {
+        const response = await axios.post(backendUrl + '/api/order/refund-status', { refundID: id, status: 'Rejected' });
+        if (response.data.success) {
+          toast.success(response.data.message);
+
+        } else {
+          toast.error(response.data.message);
+        }
+      } catch (error) {
+        console.log(error);
+        alert(error.message);
+      }
+    }
+    
+  }
+  const handelApprove = () => {
+
+  }
   useEffect(() => {
     const fetchRefunds = async () => {
       try {
@@ -21,6 +42,7 @@ export default function OrderCancellation() {
         alert(error.message);
       }
     }
+    handelReject();
     fetchRefunds();
   })
 
@@ -39,8 +61,7 @@ export default function OrderCancellation() {
                 <p><span className='font-semibold'>Additional Info:</span> {refund.additionalInfo}</p>
                 <p><span className='font-semibold'>Date:</span> {new Date(refund.date).toLocaleString()}</p>
                 <p><span className='font-semibold'>Request Date:</span> {new Date(refund.requestDate).toLocaleString()}</p>
-                <button className='bg-red-500 text-white px-4 py-2 rounded-md'>Reject</button>
-                <button className='bg-green-500 text-white px-4 py-2 rounded-md'>Approve</button>
+                <p><span className='font-bold text-xl'>{refund.status}</span></p>
               </div>
             ))}
           </>

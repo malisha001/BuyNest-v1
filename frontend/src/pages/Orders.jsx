@@ -17,6 +17,10 @@ const Orders = () => {
 
       const response = await axios.post(backendUrl + '/api/order/userorders', {}, { headers: { token } });
       if (response.data.success) {
+        if (!response.data.orders || response.data.orders.length === 0) {
+          console.warn("No orders found for the user.");
+          return;
+        }
         let allOrdersItem = [];
         response.data.orders.map((order) => {
           order.items.map((item) => {

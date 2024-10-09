@@ -12,7 +12,8 @@ const placeRefund = async (req, res) => {
             reasons,
             additionalInfo,
             date,
-            reqestDate: Date.now()
+            reqestDate: Date.now(),
+            status: 'Pending'
         }
         console.log(refundData);
 
@@ -40,5 +41,42 @@ const getAllRefunds = async (req, res) => {
     }
 }
 
-export { placeRefund, getAllRefunds }
+const getRefundByUser = async (req, res) => {
+    try {
+        const refunds = await refundModel.find({ userID: req.body.userID });
+        res.json({ success: true, refunds });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+}
+
+const updateRefundStatus = async (req, res) => {
+
+    try {
+        const refund = await refundModel.findById(req.body.refundID);
+        refund.status = req.body.status;
+        await refund.save();
+        res.json({ success: true, message: 'Refund status updated' });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+
+}
+
+const deleteRefund = async (req, res) => {
+    try {
+        const refund = await refundModel.deleteOne({refundID: req.body.refundID});
+        res.json({ success: true, message: 'Refund deleted' });
+    }
+    catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+}
+
+
+
+export { placeRefund, getAllRefunds, getRefundByUser, updateRefundStatus, deleteRefund }
 

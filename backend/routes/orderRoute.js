@@ -1,8 +1,9 @@
 import express from 'express'
 import {placeOrder, placeOrderStripe, placeOrderRazorpay, allOrders, userOrders, updateStatus, verifyStripe, verifyRazorpay,getOrderDetails } from '../controllers/orderController.js'
-import { getAllRefunds, placeRefund } from '../controllers/refundController.js'
+import { getAllRefunds, placeRefund, getRefundByUser,deleteRefund } from '../controllers/refundController.js'
 import adminAuth  from '../middleware/adminAuth.js'
 import authUser from '../middleware/auth.js'
+import { get } from 'mongoose'
 
 const orderRouter = express.Router()
 
@@ -21,6 +22,9 @@ orderRouter.post('/userorders',authUser,userOrders)
 orderRouter.post('/track-order', getOrderDetails);
 orderRouter.post('/refund', getOrderDetails);
 orderRouter.post('/submit-refund',placeRefund);
+orderRouter.post('/get-refunds',getRefundByUser);
+orderRouter.post('/refund-status',updateStatus);
+orderRouter.post('/refund-delete',deleteRefund);
 
 // verify payment
 orderRouter.post('/verifyStripe',authUser, verifyStripe)

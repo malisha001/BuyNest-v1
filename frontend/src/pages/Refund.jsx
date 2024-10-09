@@ -20,6 +20,16 @@ export default function Refund() {
     const onSubmitHandler = async (e) => {
       e.preventDefault();
       try {
+        if (!orderDetails._id || !orderDetails.userId || !orderDetails.date) {
+          toast.error('Order details are incomplete.');
+          return;
+        }
+
+        if (reasons.length === 0 && !rfun_reason) {
+          toast.error('Please provide at least one reason for the refund.');
+          return;
+        }
+        
           const formData = {
               orderID: orderDetails._id,  // directly from orderDetails
               userID: orderDetails.userId,  // directly from orderDetails
