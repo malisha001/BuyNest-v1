@@ -22,20 +22,17 @@ BuyNest is designed to empower visually impaired users by providing accessible o
 
 ### Live Human Experience
 - **Real-Time Assistance**: Users can connect with registered helpers who provide verbal guidance through live voice chat. Helpers describe the website's layout, navigation, and product details.
-- **Voice Interaction**: Users can interact with helpers via voice chat and issue voice commands for navigation and product exploration.
 - **Request Handling**: Registered helpers receive and respond to assistance requests, guiding users through the website’s functionalities.
+- **Live Cart Sharing**: Users can share their live shopping cart in real-time with the helper. Through WebSockets, helpers can view the user’s cart.
 
 ### Accessibility and Customization
-- **Adjustable Settings**: Users can modify font size, page colors, and voice-over options to personalize their browsing experience.
-- **Voice Command Navigation**: Navigate and interact with the app using customizable voice commands, enabling easier use for visually impaired users.
-- **Screen Reader Compatibility**: Full compatibility with screen readers ensures efficient content access for users.
-- **Audio Descriptions**: Detailed audio descriptions are provided for products, categories, and other elements on the website.
 - **Accessibility Bar**: A floating accessibility toolbar provides users with immediate access to key features such as:
   - **Adjustable Text Sizes**: Quickly adjust the text size for better readability.
   - **High-Contrast Mode**: Toggle between high-contrast color schemes for better visibility.
   - **Voice Command Navigation**: Activate voice navigation for hands-free interaction with the app.
   - **Screen Narration**: Enable or disable screen narration for step-by-step guidance through the app.
-
+- **Screen Reader Compatibility**: Full compatibility with screen readers ensures efficient content access for users.
+- **Audio Descriptions**: Detailed audio descriptions are provided for products, categories, and other elements on the website.
 
 ### Order & Payment Management
 - **Cart and Checkout**: Users can manage their cart, proceed to checkout, and complete purchases with voice-assisted guidance.
@@ -46,8 +43,6 @@ BuyNest is designed to empower visually impaired users by providing accessible o
 ### User and Product Management
 - **User Profiles**: Users can manage their information, preferences, and saved settings, improving personalization.
 - **Product Listings**: Product details, availability status, and audio descriptions are made accessible for easy browsing.
-- **Voice-Enabled Search and Filter**: Users can search for and filter products using voice commands, making it easy to find specific items.
-- **Audio Tags and Descriptions**: Audio tags and descriptions are provided for additional context and accessibility across the platform.
 
 ## Technologies Used
 
