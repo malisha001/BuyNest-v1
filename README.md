@@ -131,3 +131,9 @@ Admins can:
 2. **Manage products**: Add, remove, and update product listings.
 3. **Oversee order and payment processing**: Ensure secure payments and timely order fulfillment.
 
+Helper's Role:
+
+1. **Log in as a Helper**: Use the credentials helper@gmail.com to log in as a helper.
+2. **Assist Users**: Provide live voice assistance through real-time voice chat.
+3. **View Live Cart**: View users' live cart via WebSockets and guide them through the checkout process.
+
