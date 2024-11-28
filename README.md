@@ -30,6 +30,11 @@ BuyNest is designed to empower visually impaired users by providing accessible o
 - **Voice Command Navigation**: Navigate and interact with the app using customizable voice commands, enabling easier use for visually impaired users.
 - **Screen Reader Compatibility**: Full compatibility with screen readers ensures efficient content access for users.
 - **Audio Descriptions**: Detailed audio descriptions are provided for products, categories, and other elements on the website.
+- **Accessibility Bar**: A floating accessibility toolbar provides users with immediate access to key features such as:
+  - **Adjustable Text Sizes**: Quickly adjust the text size for better readability.
+  - **High-Contrast Mode**: Toggle between high-contrast color schemes for better visibility.
+  - **Voice Command Navigation**: Activate voice navigation for hands-free interaction with the app.
+  - **Screen Narration**: Enable or disable screen narration for step-by-step guidance through the app.
 
 
 ### Order & Payment Management
@@ -53,6 +58,7 @@ BuyNest is designed to empower visually impaired users by providing accessible o
 - **Screen Reader Compatibility**: Fully accessible with screen readers.
 - **Audio Cues**: Integration of custom audio cues for events.
 - **Voice Command Handling**: Integrated voice command capabilities for navigation.
+- **Accessibility Bar**: A floating toolbar with quick access to customization features.
 
 ## Deployment Links
 
